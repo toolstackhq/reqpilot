@@ -1,0 +1,192 @@
+.root {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+
+.urlBar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.methodSelect,
+.urlInput,
+.sendButton,
+.loading,
+.panel button,
+.panel input,
+.panel select,
+.panel textarea {
+  border: 1px solid var(--border);
+  background: var(--editor-bg);
+  color: var(--text-primary);
+}
+
+.methodSelect {
+  font-family: var(--font-code);
+  font-weight: 700;
+  padding: 0.5rem;
+  min-width: 6rem;
+}
+
+.methodGET {
+  color: var(--method-get);
+}
+
+.methodPOST {
+  color: var(--method-post);
+}
+
+.methodPUT {
+  color: var(--method-put);
+}
+
+.methodPATCH {
+  color: var(--method-patch);
+}
+
+.methodDELETE {
+  color: var(--method-delete);
+}
+
+.methodHEAD {
+  color: var(--method-head);
+}
+
+.methodOPTIONS {
+  color: var(--method-options);
+}
+
+.urlInput {
+  font-family: var(--font-code);
+  padding: 0.5rem;
+}
+
+.sendButton {
+  padding: 0.5rem 0.875rem;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  border: 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: var(--font-code);
+}
+
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab,
+.tabActive {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  padding: 0.625rem 0.75rem;
+  white-space: nowrap;
+}
+
+.tabActive {
+  border-bottom-color: var(--focus-ring);
+  color: var(--text-primary);
+}
+
+.panel {
+  overflow: auto;
+  padding: 0.75rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border-top: 1px solid var(--border);
+  text-align: left;
+  padding: 0.375rem;
+}
+
+.table th {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: var(--font-code);
+}
+
+.table input,
+.table button {
+  width: 100%;
+  padding: 0.375rem;
+}
+
+.table button {
+  width: auto;
+}
+
+.keyValueWrap {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.addRowButton {
+  justify-self: start;
+  padding: 0.375rem 0.625rem;
+}
+
+.bodyEditor,
+.authEditor,
+.scriptPanel {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.editorWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.lineNumbers {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-right: 0;
+  padding: 0.625rem 0.5rem;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.textarea,
+.textareaError,
+.scriptPanel textarea {
+  min-height: 11rem;
+  border: 1px solid var(--border);
+  background: var(--editor-bg);
+  color: var(--text-primary);
+  padding: 0.625rem;
+  resize: vertical;
+}
+
+.textareaError {
+  border-color: var(--method-delete);
+}
+
+.scriptToolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.error {
+  color: var(--method-delete);
+  margin: 0;
+  font-size: 0.75rem;
+}
