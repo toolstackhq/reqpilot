@@ -1,0 +1,40 @@
+{
+  "name": "reqpilot",
+  "version": "1.0.0",
+  "description": "Lightweight local-first REST API client. Modern Postman alternative.",
+  "type": "module",
+  "bin": {
+    "reqpilot": "./server.js"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "node server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:all": "vitest run && playwright test",
+    "mock-server": "node tests/mock-server/mock-api-server.js"
+  },
+  "files": [
+    "server.js",
+    "dist/**"
+  ],
+  "dependencies": {
+    "express": "^4.19.2",
+    "js-yaml": "^4.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^24.1.1",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.8"
+  }
+}
