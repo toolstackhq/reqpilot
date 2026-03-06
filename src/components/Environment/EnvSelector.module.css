@@ -1,0 +1,15 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.select,
+.button {
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.5rem;
+}
