@@ -1,0 +1,12 @@
+{
+  "id": "env-1",
+  "name": "ReqPilot Env",
+  "_postman_variable_scope": "environment",
+  "values": [
+    { "key": "baseUrl", "value": "http://localhost:4444", "enabled": true },
+    { "key": "apiVersion", "value": "v2", "enabled": true },
+    { "key": "authToken", "value": "secret-token", "disabled": true },
+    { "key": "userId", "value": "42", "enabled": true },
+    { "key": "timeout", "value": "3000", "enabled": true }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "info": {
+    "name": "Deep Nest",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "L1",
+      "item": [
+        {
+          "name": "L2",
+          "item": [
+            {
+              "name": "L3",
+              "item": [
+                {
+                  "name": "L4",
+                  "item": [
+                    {
+                      "name": "L5",
+                      "item": [
+                        {
+                          "name": "L6",
+                          "item": [
+                            {
+                              "name": "Deep Request",
+                              "request": {
+                                "method": "GET",
+                                "url": {
+                                  "raw": "http://localhost:4444/api/users"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

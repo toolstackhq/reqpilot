@@ -1,0 +1,181 @@
+{
+  "info": {
+    "name": "ReqPilot Postman v2.1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4444" },
+    { "key": "apiVersion", "value": "v1" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status', function(){",
+                  "  pm.response.to.have.status(200)",
+                  "})"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sam\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": ["pm.environment.set('reqStart', Date.now())"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Changed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Bearer Login",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "test-token-123" }]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/bearer"
+            }
+          }
+        },
+        {
+          "name": "Basic Login",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "admin" },
+                { "key": "password", "value": "password" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/basic"
+            }
+          }
+        },
+        {
+          "name": "Api Key Login",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                { "key": "key", "value": "X-API-Key" },
+                { "key": "value", "value": "key-abc-123" },
+                { "key": "in", "value": "header" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/apikey"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('is ok', function(){",
+                  " pm.expect(pm.response.code).to.eql(200)",
+                  "})"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/2"
+            }
+          }
+        },
+        {
+          "name": "Form Url Encoded",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "foo", "value": "bar" },
+                { "key": "baz", "value": "qux" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/echo/form"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": ["pm.environment.set('lastBodyMode', 'urlencoded')"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

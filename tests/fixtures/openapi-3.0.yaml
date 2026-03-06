@@ -1,0 +1,21 @@
+openapi: 3.0.3
+info:
+  title: OpenAPI 3
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v2
+paths:
+  /users:
+    get:
+      operationId: listUsers
+    post:
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: jane

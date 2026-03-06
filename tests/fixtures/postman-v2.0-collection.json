@@ -1,0 +1,38 @@
+{
+  "info": {
+    "name": "ReqPilot Postman v2.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"John\"}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/users/4"
+          }
+        }
+      ]
+    }
+  ]
+}

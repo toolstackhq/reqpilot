@@ -1,0 +1,68 @@
+{
+  "swagger": "2.0",
+  "info": { "title": "Swagger API", "version": "1.0.0" },
+  "host": "api.example.com",
+  "basePath": "/v1",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "ApiKeyAuth": { "type": "apiKey", "name": "X-API-Key", "in": "header" },
+    "BasicAuth": { "type": "basic" }
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "List users",
+        "parameters": [
+          { "name": "limit", "in": "query", "type": "integer" }
+        ]
+      },
+      "post": {
+        "summary": "Create user",
+        "parameters": [
+          { "name": "body", "in": "body", "schema": { "$ref": "#/definitions/User" } }
+        ],
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get user",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ]
+      },
+      "put": {
+        "summary": "Update user",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          { "name": "body", "in": "body", "schema": { "$ref": "#/definitions/User" } }
+        ],
+        "security": [{ "BasicAuth": [] }]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "age": { "type": "integer" }
+      }
+    },
+    "Post": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

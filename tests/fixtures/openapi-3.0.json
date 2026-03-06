@@ -1,0 +1,63 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "OpenAPI 3", "version": "1.0.0" },
+  "servers": [{ "url": "https://api.example.com/v2" }],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "operationId": "listUsers",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ]
+      },
+      "post": {
+        "tags": ["Users"],
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserCreate" }
+            }
+          }
+        },
+        "security": [{ "BearerAuth": [] }]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "operationId": "getUser",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ]
+      },
+      "delete": {
+        "tags": ["Users"],
+        "operationId": "deleteUser",
+        "security": [{ "ApiKeyAuth": [] }]
+      }
+    },
+    "/settings": {
+      "get": {
+        "tags": ["Settings"],
+        "operationId": "getSettings"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": { "type": "http", "scheme": "bearer" },
+      "ApiKeyAuth": { "type": "apiKey", "name": "X-API-Key", "in": "header" }
+    },
+    "schemas": {
+      "UserCreate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "jane" },
+          "age": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

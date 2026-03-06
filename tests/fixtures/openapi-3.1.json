@@ -1,0 +1,47 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "OpenAPI 3.1", "version": "1.0.0" },
+  "servers": [{ "url": "{protocol}://api.example.com" }],
+  "paths": {
+    "/events": {
+      "post": {
+        "operationId": "createEvent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": ["string", "null"] },
+                  "meta": { "$ref": "#/components/schemas/Meta" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {
+    "eventCreated": {
+      "post": {
+        "operationId": "onEventCreated"
+      }
+    },
+    "eventDeleted": {
+      "post": {
+        "operationId": "onEventDeleted"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "source": { "type": "string" }
+        }
+      }
+    }
+  }
+}

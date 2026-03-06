@@ -1,0 +1,34 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Circular", "version": "1.0.0" },
+  "servers": [{ "url": "https://api.example.com" }],
+  "paths": {
+    "/node": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/A" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "A": {
+        "type": "object",
+        "properties": {
+          "b": { "$ref": "#/components/schemas/B" }
+        }
+      },
+      "B": {
+        "type": "object",
+        "properties": {
+          "a": { "$ref": "#/components/schemas/A" }
+        }
+      }
+    }
+  }
+}
