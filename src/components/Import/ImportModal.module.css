@@ -1,0 +1,68 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: grid;
+  place-items: center;
+  z-index: 13;
+}
+
+.dialog {
+  width: min(44rem, 100vw - 1.5rem);
+  max-height: min(42rem, 100vh - 1.5rem);
+  overflow: auto;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.header,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  border-bottom: 0;
+}
+
+.header button,
+.footer button,
+.dropZone button {
+  border: 1px solid var(--border);
+  background: var(--editor-bg);
+  color: var(--text-primary);
+  padding: 0.375rem 0.5rem;
+}
+
+.dropZone {
+  margin: 0.75rem;
+  border: 1px dashed var(--border);
+  background: var(--bg-tertiary);
+  text-align: center;
+  padding: 1rem;
+}
+
+.meta,
+.warning {
+  margin: 0.25rem 0.75rem;
+}
+
+.warning {
+  color: var(--method-delete);
+}
+
+.preview {
+  margin: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--editor-bg);
+  padding: 0.75rem;
+}
+
+.preview ul {
+  margin: 0;
+  padding-left: 1rem;
+}
