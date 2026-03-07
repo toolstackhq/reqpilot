@@ -391,10 +391,12 @@ export default function App() {
                   </button>
                 </div>
               ))}
+              <div className={styles.requestTabItem}>
+                <button className={styles.requestTabAdd} type="button" aria-label="Add request tab" onClick={addNewRequestTab}>
+                  +
+                </button>
+              </div>
             </div>
-            <button className={styles.requestTabAdd} type="button" aria-label="Add request tab" onClick={addNewRequestTab}>
-              +
-            </button>
           </div>
 
           <section className={styles.requestPane} aria-label="Request Builder">

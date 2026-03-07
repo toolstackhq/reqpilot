@@ -17,7 +17,7 @@
 }
 
 .brand {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text-primary);
@@ -160,7 +160,6 @@
 .requestTabsBar {
   display: flex;
   align-items: stretch;
-  justify-content: space-between;
   min-width: 0;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
@@ -168,6 +167,7 @@
 
 .requestTabsList {
   display: flex;
+  align-items: stretch;
   min-width: 0;
   overflow-x: auto;
 }
@@ -185,8 +185,8 @@
   border: 0;
   background: transparent;
   color: var(--text-primary);
-  padding: 0.45rem 0.7rem;
-  font-size: 0.75rem;
+  padding: 0.38rem 0.62rem;
+  font-size: 0.6875rem;
   white-space: nowrap;
 }
 
@@ -195,6 +195,7 @@
   font-weight: 600;
   margin-right: 0.3rem;
   font-family: var(--font-code);
+  font-size: 0.6875rem;
 }
 
 .requestTab,
@@ -221,7 +222,7 @@
 
 .requestTabClose {
   color: var(--text-muted);
-  padding-inline: 0.45rem;
+  padding-inline: 0.38rem;
   display: grid;
   place-items: center;
 }
@@ -234,7 +235,6 @@
 .requestTabAdd {
   width: 2.25rem;
   color: var(--text-secondary);
-  border-left: 1px solid var(--border);
   display: grid;
   place-items: center;
 }

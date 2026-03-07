@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from './Sidebar.module.css';
+import { CreateCollectionModal } from './CreateCollectionModal.jsx';
 
 export function Collections({
   collections,
@@ -12,6 +13,7 @@ export function Collections({
 }) {
   const [collapsedIds, setCollapsedIds] = useState(() => new Set(collections.map((collection) => collection.id)));
   const [query, setQuery] = useState('');
+  const [showCreateCollection, setShowCreateCollection] = useState(false);
 
   const knownIds = useMemo(() => new Set(collections.map((collection) => collection.id)), [collections]);
   const filteredCollections = useMemo(() => {
@@ -60,6 +62,19 @@ export function Collections({
     });
   }
 
+  function openCreateCollection() {
+    setShowCreateCollection(true);
+  }
+
+  function closeCreateCollection() {
+    setShowCreateCollection(false);
+  }
+
+  function submitCreateCollection(name) {
+    onCreate(name);
+    setShowCreateCollection(false);
+  }
+
   return (
     <div className={`${styles.panel} ${workspaceMode ? styles.workspacePanel : ''}`}>
       <header className={styles.header}>
@@ -74,15 +89,7 @@ export function Collections({
         <div className={styles.actions}>
           {workspaceMode ? (
             <>
-              <button
-                type="button"
-                onClick={() => {
-                  const name = window.prompt('Collection name', 'New Collection');
-                  if (name) {
-                    onCreate(name);
-                  }
-                }}
-              >
+              <button type="button" onClick={openCreateCollection}>
                 + New
               </button>
               <button type="button" onClick={onOpenImport} aria-label="Import collection">
@@ -91,15 +98,7 @@ export function Collections({
             </>
           ) : (
             <>
-              <button
-                type="button"
-                onClick={() => {
-                  const name = window.prompt('Collection name', 'New Collection');
-                  if (name) {
-                    onCreate(name);
-                  }
-                }}
-              >
+              <button type="button" onClick={openCreateCollection}>
                 New
               </button>
               <button type="button" onClick={onSaveCurrent}>
@@ -138,13 +137,7 @@ export function Collections({
             <button type="button" onClick={onOpenImport}>
               Import
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                const name = window.prompt('Collection name', 'New Collection');
-                if (name) onCreate(name);
-              }}
-            >
+            <button type="button" onClick={openCreateCollection}>
               Add new
             </button>
           </div>
@@ -184,6 +177,9 @@ export function Collections({
         ))}
       </ul>
 
+      {showCreateCollection ? (
+        <CreateCollectionModal onClose={closeCreateCollection} onSubmit={submitCreateCollection} />
+      ) : null}
     </div>
   );
 }
