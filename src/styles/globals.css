@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root,
-.theme-dark {
+:root {
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f3f4f6;
@@ -16,6 +15,7 @@
   --surface-soft: #f9fafb;
   --focus-ring: #6366f1;
   --accent-primary: #6366f1;
+  --accent-primary-hover: #5459e6;
   --accent-text: #ffffff;
   --accent-success: #22c55e;
 
@@ -34,6 +34,35 @@
 
   --overlay: rgb(15 23 42 / 20%);
   --editor-bg: #ffffff;
+  --selection-bg: rgb(99 102 241 / 24%);
+
+  --json-key-color: #5669d8;
+  --json-string-color: #35a16e;
+  --json-number-color: #ae7d1f;
+  --json-bool-color: #8b5ec8;
+  --json-null-color: #d05a67;
+
+  --token-resolved: #15803d;
+  --token-missing: #b91c1c;
+
+  --state-success-fg: #16a34a;
+  --state-danger-fg: #dc2626;
+  --state-success-chip-fg: #166534;
+  --state-success-chip-border: #86efac;
+  --state-success-chip-bg: #f0fdf4;
+  --state-danger-chip-fg: #b91c1c;
+  --state-danger-chip-border: #fca5a5;
+  --state-danger-chip-bg: #fef2f2;
+
+  --line-number-color: #9cb0c5;
+  --link-color: #4f63dc;
+  --link-hover-color: #4b5dd7;
+  --accent-link-color: #6173e6;
+
+  --active-surface: #eef2ff;
+  --active-border: #c7d2fe;
+  --active-text: #4338ca;
+  --shadow-elevated: 0 12px 36px rgb(13 19 40 / 20%);
 
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'DejaVu Sans Mono',
@@ -44,24 +73,73 @@
 }
 
 .theme-light {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f3f4f6;
-  --border: #e5e7eb;
-  --border-soft: #f3f4f6;
-  --border-hover: #d1d5db;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --text-dimmed: #c4cbd4;
-  --surface: #ffffff;
-  --surface-soft: #f9fafb;
-  --focus-ring: #6366f1;
+  color-scheme: light;
+}
+
+.theme-dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --border: #334155;
+  --border-soft: #1e293b;
+  --border-hover: #475569;
+  --text-primary: #e5e7eb;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-dimmed: #64748b;
+  --surface: #111827;
+  --surface-soft: #1f2937;
+  --focus-ring: #818cf8;
   --accent-primary: #6366f1;
-  --accent-text: #ffffff;
-  --accent-success: #22c55e;
-  --overlay: rgb(15 23 42 / 20%);
-  --editor-bg: #ffffff;
+  --accent-primary-hover: #7276f8;
+  --accent-text: #eef2ff;
+  --accent-success: #4ade80;
+
+  --method-get: #4ade80;
+  --method-post: #fbbf24;
+  --method-put: #60a5fa;
+  --method-patch: #c084fc;
+  --method-delete: #f87171;
+  --method-head: #22d3ee;
+  --method-options: #94a3b8;
+
+  --status-2xx: #4ade80;
+  --status-3xx: #60a5fa;
+  --status-4xx: #fbbf24;
+  --status-5xx: #f87171;
+
+  --overlay: rgb(2 6 23 / 72%);
+  --editor-bg: #0b1220;
+  --selection-bg: rgb(129 140 248 / 30%);
+
+  --json-key-color: #93c5fd;
+  --json-string-color: #86efac;
+  --json-number-color: #fcd34d;
+  --json-bool-color: #c4b5fd;
+  --json-null-color: #fda4af;
+
+  --token-resolved: #4ade80;
+  --token-missing: #f87171;
+
+  --state-success-fg: #4ade80;
+  --state-danger-fg: #f87171;
+  --state-success-chip-fg: #4ade80;
+  --state-success-chip-border: rgb(74 222 128 / 45%);
+  --state-success-chip-bg: rgb(34 197 94 / 14%);
+  --state-danger-chip-fg: #fca5a5;
+  --state-danger-chip-border: rgb(248 113 113 / 45%);
+  --state-danger-chip-bg: rgb(248 113 113 / 14%);
+
+  --line-number-color: #6f86a3;
+  --link-color: #a5b4fc;
+  --link-hover-color: #c7d2fe;
+  --accent-link-color: #a5b4fc;
+
+  --active-surface: rgb(99 102 241 / 22%);
+  --active-border: #818cf8;
+  --active-text: #c7d2fe;
+  --shadow-elevated: 0 16px 40px rgb(2 6 23 / 45%);
+  color-scheme: dark;
 }
 
 * {
@@ -139,23 +217,23 @@ button {
 }
 
 .json-key {
-  color: #5669d8;
+  color: var(--json-key-color);
 }
 
 .json-string {
-  color: #35a16e;
+  color: var(--json-string-color);
 }
 
 .json-number {
-  color: #ae7d1f;
+  color: var(--json-number-color);
 }
 
 .json-bool {
-  color: #8b5ec8;
+  color: var(--json-bool-color);
 }
 
 .json-null {
-  color: #d05a67;
+  color: var(--json-null-color);
 }
 
 ::-webkit-scrollbar {

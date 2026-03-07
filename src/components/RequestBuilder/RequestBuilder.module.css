@@ -153,12 +153,12 @@
 }
 
 .urlTokenResolved {
-  color: #15803d;
+  color: var(--token-resolved);
   font-weight: 600;
 }
 
 .urlTokenMissing {
-  color: #b91c1c;
+  color: var(--token-missing);
   font-weight: 600;
 }
 
@@ -167,7 +167,7 @@
 }
 
 .urlInput::selection {
-  background: rgb(99 102 241 / 24%);
+  background: var(--selection-bg);
   color: transparent;
 }
 
@@ -243,8 +243,8 @@
 
 .sendButton:hover,
 .sendButtonCaret:hover {
-  background: #5459e6;
-  border-color: #5459e6;
+  background: var(--accent-primary-hover);
+  border-color: var(--accent-primary-hover);
 }
 
 .saveButton:hover,
@@ -463,11 +463,11 @@
 }
 
 .actionOk {
-  color: #16a34a;
+  color: var(--state-success-fg);
 }
 
 .actionDelete {
-  color: #dc2626;
+  color: var(--state-danger-fg);
 }
 
 .actionOk:hover,
@@ -571,7 +571,7 @@
   margin: 0;
   border-right: 1px solid var(--border-soft);
   padding: 0.55rem 0.35rem;
-  color: #9cb0c5;
+  color: var(--line-number-color);
   background: var(--surface-soft);
   font-family: var(--font-code);
   text-align: center;
@@ -632,7 +632,7 @@
 }
 
 .textareaSyntax::selection {
-  background: rgb(99 102 241 / 24%);
+  background: var(--selection-bg);
   color: transparent;
 }
 
@@ -675,7 +675,7 @@
 }
 
 .docLink {
-  color: #4f63dc;
+  color: var(--link-color);
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
@@ -696,7 +696,7 @@
 .snippetButton {
   border: 0;
   background: transparent;
-  color: #6173e6;
+  color: var(--accent-link-color);
   text-align: left;
   padding: 0.2rem 0;
   font-size: 0.82rem;
@@ -704,7 +704,7 @@
 }
 
 .snippetButton:hover {
-  color: #4b5dd7;
+  color: var(--link-hover-color);
 }
 
 .authTypeGroup {
@@ -777,7 +777,7 @@
 }
 
 .authAside a {
-  color: #5f70e3;
+  color: var(--accent-link-color);
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;

@@ -93,9 +93,9 @@
 }
 
 .envTabActive {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #4338ca;
+  background: var(--active-surface);
+  border-color: var(--active-border);
+  color: var(--active-text);
 }
 
 .createRow {

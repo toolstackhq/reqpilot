@@ -333,15 +333,15 @@
 }
 
 .envVarResolved {
-  color: #166534;
-  border-color: #86efac;
-  background: #f0fdf4;
+  color: var(--state-success-chip-fg);
+  border-color: var(--state-success-chip-border);
+  background: var(--state-success-chip-bg);
 }
 
 .envVarMissing {
-  color: #b91c1c;
-  border-color: #fca5a5;
-  background: #fef2f2;
+  color: var(--state-danger-chip-fg);
+  border-color: var(--state-danger-chip-border);
+  background: var(--state-danger-chip-bg);
 }
 
 .envVarMore {
@@ -357,7 +357,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgb(15 18 30 / 18%);
+  background: var(--overlay);
   border: 0;
 }
 

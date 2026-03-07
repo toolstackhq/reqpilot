@@ -13,7 +13,7 @@
   border: 1px solid var(--border);
   border-radius: 0.55rem;
   background: var(--bg-secondary);
-  box-shadow: 0 12px 36px rgb(13 19 40 / 20%);
+  box-shadow: var(--shadow-elevated);
 }
 
 .header {

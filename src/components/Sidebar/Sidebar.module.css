@@ -195,8 +195,8 @@
 }
 
 .rowActive {
-  border-color: var(--focus-ring);
-  background: #eef2ff;
+  border-color: var(--active-border);
+  background: var(--active-surface);
 }
 
 .method {
@@ -306,9 +306,9 @@
 }
 
 .historyTabActive {
-  border-color: var(--focus-ring);
-  color: var(--focus-ring);
-  background: #eef2ff;
+  border-color: var(--active-border);
+  color: var(--active-text);
+  background: var(--active-surface);
 }
 
 .historyCopy {
