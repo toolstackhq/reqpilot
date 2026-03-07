@@ -78,14 +78,7 @@ export function Collections({
   return (
     <div className={`${styles.panel} ${workspaceMode ? styles.workspacePanel : ''}`}>
       <header className={styles.header}>
-        {workspaceMode ? (
-          <div>
-            <div className={styles.breadcrumbs}>Personal Workspace &nbsp;›&nbsp; Collections</div>
-            <h2 className={styles.workspaceHeading}>Collections</h2>
-          </div>
-        ) : (
-          <h2>Collections</h2>
-        )}
+        <h2>Collections</h2>
         <div className={styles.actions}>
           {workspaceMode ? (
             <>

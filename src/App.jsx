@@ -490,24 +490,28 @@ export default function App() {
             className={styles.railButton}
             type="button"
             aria-label="Collections"
+            title="Collections"
             onClick={() => document.getElementById('collections-panel')?.scrollIntoView({ behavior: 'smooth' })}
           >
             ▦
           </button>
-          <button className={styles.railButton} type="button" aria-label="Environments" onClick={() => setShowEnvManager(true)}>
+          <button
+            className={styles.railButton}
+            type="button"
+            aria-label="Environments"
+            title="Environments"
+            onClick={() => setShowEnvManager(true)}
+          >
             ◎
           </button>
-          <button className={styles.railButton} type="button" aria-label="History" onClick={() => setShowHistory(true)}>
+          <button
+            className={styles.railButton}
+            type="button"
+            aria-label="History"
+            title="History"
+            onClick={() => setShowHistory(true)}
+          >
             ◷
-          </button>
-          <button className={styles.railButton} type="button" aria-label="Sharing">
-            ⤴
-          </button>
-          <button className={styles.railButton} type="button" aria-label="Code generation">
-            &lt;/&gt;
-          </button>
-          <button className={styles.railButton} type="button" aria-label="Response history">
-            ☰
           </button>
         </nav>
 
