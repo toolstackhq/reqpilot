@@ -1,20 +1,21 @@
 import { test, expect } from '@playwright/test';
 
-test('collections drawer create/save/load/persist', async ({ page }) => {
+test('collections panel create/save/load/persist', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Collections' }).click();
   await expect(page.getByRole('heading', { name: 'Collections' })).toBeVisible();
 
-  page.once('dialog', (dialog) => dialog.accept('Smoke Collection'));
-  await page.getByRole('button', { name: 'New' }).click();
-
-  page.once('dialog', (dialog) => dialog.accept('Users request'));
-  await page.getByRole('button', { name: 'Save Request' }).click();
+  await page.keyboard.press('ControlOrMeta+s');
+  const saveDialog = page.getByRole('dialog', { name: 'Save Request' });
+  await expect(saveDialog).toBeVisible();
+  await saveDialog.getByLabel('Create new collection').check();
+  await saveDialog.getByTestId('save-new-collection').fill('Smoke Collection');
+  await saveDialog.getByTestId('save-request-name').fill('Users request');
+  await saveDialog.getByTestId('save-request-confirm').click();
 
   await expect(page.getByText('Smoke Collection')).toBeVisible();
+  await page.getByRole('button', { name: 'Smoke Collection' }).click();
   await expect(page.getByText('Users request')).toBeVisible();
 
   await page.reload();
-  await page.getByRole('button', { name: 'Collections' }).click();
   await expect(page.getByText('Smoke Collection')).toBeVisible();
 });

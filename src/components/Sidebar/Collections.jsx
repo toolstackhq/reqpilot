@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './Sidebar.module.css';
 
 export function Collections({
@@ -10,7 +10,7 @@ export function Collections({
   onOpenImport,
   workspaceMode = false,
 }) {
-  const [collapsedIds, setCollapsedIds] = useState(() => new Set());
+  const [collapsedIds, setCollapsedIds] = useState(() => new Set(collections.map((collection) => collection.id)));
   const [query, setQuery] = useState('');
 
   const knownIds = useMemo(() => new Set(collections.map((collection) => collection.id)), [collections]);
@@ -31,6 +31,18 @@ export function Collections({
         return inCollectionName || collection.requests.length > 0;
       });
   }, [collections, query]);
+
+  useEffect(() => {
+    setCollapsedIds((prev) => {
+      const next = new Set([...prev].filter((id) => knownIds.has(id)));
+      for (const collection of collections) {
+        if (!next.has(collection.id)) {
+          next.add(collection.id);
+        }
+      }
+      return next;
+    });
+  }, [collections, knownIds]);
 
   function isCollapsed(id) {
     return collapsedIds.has(id);
