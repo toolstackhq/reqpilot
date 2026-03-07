@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './RequestBuilder.module.css';
 import { KeyValueEditor } from './KeyValueEditor.jsx';
+import { highlightJson } from '../../utils/syntaxHighlight.js';
 
 const BODY_TYPES = ['none', 'json', 'form-data', 'x-www-form-urlencoded', 'raw'];
 
@@ -11,9 +12,13 @@ function toLineNumbers(text) {
 
 export function BodyEditor({ body, onChange }) {
   const [error, setError] = useState('');
+  const [copyState, setCopyState] = useState('idle');
+  const jsonHighlightRef = useRef(null);
 
   const lineNumbers = useMemo(() => toLineNumbers(body.raw || ''), [body.raw]);
   const isEmptyBody = body.type === 'none';
+  const canPrettify = body.type === 'json' && Boolean(body.raw?.trim());
+  const highlightedJson = useMemo(() => highlightJson(body.raw || ''), [body.raw]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -31,6 +36,38 @@ export function BodyEditor({ body, onChange }) {
 
     return () => window.clearTimeout(timer);
   }, [body.raw, body.type]);
+
+  function prettifyJson() {
+    if (!canPrettify) return;
+
+    try {
+      const parsed = JSON.parse(body.raw);
+      onChange({ ...body, raw: JSON.stringify(parsed, null, 2) });
+      setError('');
+    } catch (jsonError) {
+      setError(jsonError.message);
+    }
+  }
+
+  function syncJsonHighlightScroll(event) {
+    if (!jsonHighlightRef.current) return;
+    jsonHighlightRef.current.scrollTop = event.target.scrollTop;
+    jsonHighlightRef.current.scrollLeft = event.target.scrollLeft;
+  }
+
+  async function copyBodyText() {
+    const text = body.raw || '';
+    if (!text) return;
+    if (!navigator?.clipboard?.writeText) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyState('copied');
+      window.setTimeout(() => setCopyState('idle'), 1200);
+    } catch {
+      setCopyState('idle');
+    }
+  }
 
   return (
     <div className={styles.bodyEditor}>
@@ -50,8 +87,23 @@ export function BodyEditor({ body, onChange }) {
               </option>
             ))}
           </select>
-          <button className={styles.overrideButton} type="button">
-            Override
+          <button
+            className={styles.overrideButton}
+            type="button"
+            onClick={prettifyJson}
+            disabled={!canPrettify}
+            aria-label="Prettify JSON body"
+          >
+            Prettify
+          </button>
+          <button
+            className={styles.overrideButton}
+            type="button"
+            onClick={copyBodyText}
+            disabled={!(body.type === 'json' || body.type === 'raw') || !body.raw?.length}
+            aria-label="Copy request body"
+          >
+            {copyState === 'copied' ? 'Copied' : 'Copy'}
           </button>
         </div>
       </header>
@@ -73,7 +125,38 @@ export function BodyEditor({ body, onChange }) {
           </div>
         ) : null}
 
-        {(body.type === 'json' || body.type === 'raw') && !isEmptyBody && (
+        {body.type === 'json' && !isEmptyBody && (
+          <div className={styles.editorWrap}>
+            <pre className={styles.lineNumbers} aria-hidden="true">
+              {lineNumbers}
+            </pre>
+            <div className={`${styles.codeInputWrap} ${error ? styles.codeInputWrapError : ''}`}>
+              {body.raw?.length ? (
+                <pre
+                  className={styles.jsonHighlight}
+                  ref={jsonHighlightRef}
+                  aria-hidden="true"
+                  dangerouslySetInnerHTML={{ __html: highlightedJson }}
+                />
+              ) : (
+                <pre className={`${styles.jsonHighlight} ${styles.jsonPlaceholder}`} ref={jsonHighlightRef} aria-hidden="true">
+                  {'{\n  "key": "value"\n}'}
+                </pre>
+              )}
+              <textarea
+                className={styles.textareaSyntax}
+                value={body.raw || ''}
+                onChange={(event) => onChange({ ...body, raw: event.target.value })}
+                placeholder=""
+                onScroll={syncJsonHighlightScroll}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? 'body-json-error' : undefined}
+              />
+            </div>
+          </div>
+        )}
+
+        {body.type === 'raw' && !isEmptyBody && (
           <div className={styles.editorWrap}>
             <pre className={styles.lineNumbers} aria-hidden="true">
               {lineNumbers}

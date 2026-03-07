@@ -34,7 +34,7 @@ function createDefaultRequest() {
     params: [makeRow()],
     headers: [makeRow()],
     body: {
-      type: 'none',
+      type: 'json',
       raw: '',
       form: [makeRow()],
     },
@@ -562,7 +562,7 @@ export default function App() {
         <>
           <button className={styles.overlay} type="button" aria-hidden="true" onClick={() => setShowHistory(false)} />
           <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label="History Drawer">
-            <History history={history} onLoad={loadRequest} onClear={clearHistory} />
+            <History history={history} onLoad={loadRequest} onClear={clearHistory} variableValues={activeVariablesMap} />
           </aside>
         </>
       ) : null}

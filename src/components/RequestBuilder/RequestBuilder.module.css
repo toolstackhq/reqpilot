@@ -499,6 +499,11 @@
   font-weight: 600;
 }
 
+.overrideButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .bodyContent {
   flex: 1;
   min-height: 0;
@@ -552,6 +557,16 @@
   min-height: 0;
 }
 
+.codeInputWrap {
+  position: relative;
+  min-height: 0;
+}
+
+.codeInputWrapError {
+  outline: 1px solid var(--method-delete);
+  outline-offset: -1px;
+}
+
 .lineNumbers {
   margin: 0;
   border-right: 1px solid var(--border-soft);
@@ -565,7 +580,34 @@
   user-select: none;
 }
 
+.jsonHighlight {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 0.6rem 0.7rem;
+  font-family: var(--font-code);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+  pointer-events: none;
+  scrollbar-width: none;
+}
+
+.jsonHighlight::-webkit-scrollbar {
+  display: none;
+}
+
+.jsonPlaceholder {
+  color: var(--text-muted);
+}
+
 .textarea,
+.textareaSyntax,
 .textareaError,
 .scriptTextarea {
   width: 100%;
@@ -579,6 +621,19 @@
   line-height: 1.45;
   resize: none;
   min-height: 100%;
+}
+
+.textareaSyntax {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text-primary);
+}
+
+.textareaSyntax::selection {
+  background: rgb(99 102 241 / 24%);
+  color: transparent;
 }
 
 .textareaError {

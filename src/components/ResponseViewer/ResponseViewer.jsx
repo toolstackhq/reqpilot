@@ -18,6 +18,7 @@ export function ResponseViewer({ response }) {
   const [tab, setTab] = useState('JSON');
   const [showHtmlPreview, setShowHtmlPreview] = useState(false);
   const [showFullBody, setShowFullBody] = useState(false);
+  const [copyState, setCopyState] = useState('idle');
 
   const contentType = response?.headers?.['content-type'] || '';
   const isJson = contentType.includes('application/json');
@@ -41,6 +42,28 @@ export function ResponseViewer({ response }) {
   }
   const headerCount = Object.keys(response.headers || {}).length;
   const canShowJson = Boolean(isJson && parsedJson);
+
+  function copyResponseBody() {
+    if (!navigator?.clipboard?.writeText) return;
+    if (!bodyText) return;
+
+    let textToCopy = bodyText;
+    if (tab === 'JSON' && isJson) {
+      try {
+        textToCopy = JSON.stringify(JSON.parse(bodyText), null, 2);
+      } catch {
+        textToCopy = bodyText;
+      }
+    }
+
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        setCopyState('copied');
+        window.setTimeout(() => setCopyState('idle'), 1200);
+      })
+      .catch(() => setCopyState('idle'));
+  }
 
   return (
     <div className={styles.root}>
@@ -81,6 +104,14 @@ export function ResponseViewer({ response }) {
         aria-labelledby={`response-tab-${tab}`}
         className={styles.panel}
       >
+        {(tab === 'JSON' || tab === 'Raw') && (
+          <div className={styles.panelToolbar}>
+            <button type="button" className={styles.copyButton} onClick={copyResponseBody} disabled={!bodyText}>
+              {copyState === 'copied' ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+        )}
+
         {tab === 'JSON' && (
           <>
             {truncated && !showFullBody ? (
