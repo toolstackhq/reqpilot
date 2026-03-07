@@ -7,10 +7,18 @@ function escapeHtml(text) {
 
 export function highlightJson(text) {
   const escaped = escapeHtml(text);
-  return escaped
-    .replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"\s*:)/g, '<span class="json-key">$1</span>')
-    .replace(/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*")/g, '<span class="json-string">$1</span>')
-    .replace(/\b(true|false)\b/g, '<span class="json-bool">$1</span>')
-    .replace(/\b(null)\b/g, '<span class="json-null">$1</span>')
-    .replace(/\b(-?\d+(?:\.\d+)?)\b/g, '<span class="json-number">$1</span>');
+  return escaped.replace(
+    /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+    (match, _stringLiteral, keySuffix) => {
+      let cls = 'json-number';
+      if (match.startsWith('"')) {
+        cls = keySuffix ? 'json-key' : 'json-string';
+      } else if (match === 'true' || match === 'false') {
+        cls = 'json-bool';
+      } else if (match === 'null') {
+        cls = 'json-null';
+      }
+      return `<span class="${cls}">${match}</span>`;
+    }
+  );
 }

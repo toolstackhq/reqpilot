@@ -3,11 +3,10 @@ import { useEffect, useMemo, useState } from 'react';
 const STORAGE_KEY = 'reqpilot_theme';
 
 function detectDefaultTheme() {
-  if (typeof window === 'undefined') return 'theme-dark';
+  if (typeof window === 'undefined') return 'theme-light';
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (stored === 'theme-dark' || stored === 'theme-light') return stored;
-
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'theme-light' : 'theme-dark';
+  return 'theme-light';
 }
 
 export function useTheme() {

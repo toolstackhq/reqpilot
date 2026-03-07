@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
 import styles from './ResponseViewer.module.css';
-import { JsonTreeView } from './JsonTreeView.jsx';
 import { ResponseHeaders } from './ResponseHeaders.jsx';
 import { TestResults } from './TestResults.jsx';
 import { highlightJson } from '../../utils/syntaxHighlight.js';
 
-const TABS = ['Body', 'Headers', 'Cookies', 'Test Results'];
+const TABS = ['JSON', 'Raw', 'Headers', 'Test Results'];
 const MAX_RENDER_SIZE = 1024 * 1024;
 
 function statusClass(status = 0) {
@@ -15,16 +14,8 @@ function statusClass(status = 0) {
   return styles.status5xx;
 }
 
-function parseCookies(headers = {}) {
-  const raw = headers['set-cookie'] || headers['Set-Cookie'];
-  if (!raw) return [];
-  return String(raw)
-    .split(',')
-    .map((cookie) => cookie.trim());
-}
-
 export function ResponseViewer({ response }) {
-  const [tab, setTab] = useState('Body');
+  const [tab, setTab] = useState('JSON');
   const [showHtmlPreview, setShowHtmlPreview] = useState(false);
   const [showFullBody, setShowFullBody] = useState(false);
 
@@ -48,27 +39,22 @@ export function ResponseViewer({ response }) {
   if (!response) {
     return <div className={styles.emptyState}>No response yet</div>;
   }
-
-  const cookies = parseCookies(response.headers);
+  const headerCount = Object.keys(response.headers || {}).length;
+  const canShowJson = Boolean(isJson && parsedJson);
 
   return (
     <div className={styles.root}>
       <header className={styles.meta}>
-        <span className={`${styles.statusBadge} ${statusClass(response.status)}`} data-testid="response-status">
-          {response.status} {response.statusText}
+        <span className={`${styles.metaItem} ${styles.statusText} ${statusClass(response.status)}`} data-testid="response-status">
+          <span className={styles.metaLabel}>Status:</span> {response.status} • {response.statusText || 'OK'}
         </span>
-        <span>{response.time}ms</span>
-        <span>{(response.size / 1024).toFixed(2)} KB</span>
+        <span className={styles.metaItem}>
+          <span className={styles.metaLabel}>Time:</span> {response.time} ms
+        </span>
+        <span className={styles.metaItem}>
+          <span className={styles.metaLabel}>Size:</span> {(response.size / 1024).toFixed(2)} KB
+        </span>
         {response.error && <span className={styles.error}>{response.error}</span>}
-        <button
-          className={styles.copyButton}
-          type="button"
-          onClick={() => {
-            navigator.clipboard.writeText(response.body || '');
-          }}
-        >
-          Copy body
-        </button>
       </header>
 
       <nav className={styles.tabs} role="tablist" aria-label="Response tabs">
@@ -83,7 +69,8 @@ export function ResponseViewer({ response }) {
             className={tab === name ? styles.tabActive : styles.tab}
             onClick={() => setTab(name)}
           >
-            {name}
+            <span>{name}</span>
+            {name === 'Headers' ? <span className={styles.tabCount}>{headerCount}</span> : null}
           </button>
         ))}
       </nav>
@@ -94,7 +81,7 @@ export function ResponseViewer({ response }) {
         aria-labelledby={`response-tab-${tab}`}
         className={styles.panel}
       >
-        {tab === 'Body' && (
+        {tab === 'JSON' && (
           <>
             {truncated && !showFullBody ? (
               <p className={styles.notice}>
@@ -105,39 +92,34 @@ export function ResponseViewer({ response }) {
               </p>
             ) : null}
 
-            {isJson && parsedJson ? (
-              <div className={styles.jsonView}>
-                <JsonTreeView value={parsedJson} />
-                <pre className={styles.code} dangerouslySetInnerHTML={{ __html: highlightJson(JSON.stringify(parsedJson, null, 2)) }} />
-              </div>
-            ) : null}
-
-            {isHtml ? (
+            {canShowJson ? (
+              <pre
+                className={styles.code}
+                dangerouslySetInnerHTML={{ __html: highlightJson(JSON.stringify(parsedJson, null, 2)) }}
+              />
+            ) : (
               <div className={styles.htmlWrap}>
-                <button type="button" onClick={() => setShowHtmlPreview((prev) => !prev)}>
-                  {showHtmlPreview ? 'Raw' : 'Preview'}
-                </button>
-                {showHtmlPreview ? (
-                  <iframe title="HTML preview" srcDoc={renderedBody} className={styles.iframe} />
+                {isHtml ? (
+                  <>
+                    <button type="button" onClick={() => setShowHtmlPreview((prev) => !prev)}>
+                      {showHtmlPreview ? 'Raw' : 'Preview'}
+                    </button>
+                    {showHtmlPreview ? (
+                      <iframe title="HTML preview" srcDoc={renderedBody} className={styles.iframe} />
+                    ) : (
+                      <pre className={styles.code}>{renderedBody}</pre>
+                    )}
+                  </>
                 ) : (
                   <pre className={styles.code}>{renderedBody}</pre>
                 )}
               </div>
-            ) : null}
-
-            {!isJson && !isHtml ? <pre className={styles.code}>{renderedBody}</pre> : null}
+            )}
           </>
         )}
 
+        {tab === 'Raw' && <pre className={styles.code}>{renderedBody}</pre>}
         {tab === 'Headers' && <ResponseHeaders headers={response.headers} />}
-        {tab === 'Cookies' && (
-          <ul className={styles.list}>
-            {cookies.map((cookie) => (
-              <li key={cookie}>{cookie}</li>
-            ))}
-            {!cookies.length && <li>No cookies found.</li>}
-          </ul>
-        )}
         {tab === 'Test Results' && <TestResults tests={response.testResults || []} />}
       </section>
 

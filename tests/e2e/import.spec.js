@@ -13,9 +13,7 @@ test('can import postman and openapi files and show warning for invalid', async 
   await expect(page.getByText('Found')).toBeVisible();
   await dialog.getByTestId('import-confirm').click();
 
-  await page.getByRole('button', { name: 'Collections' }).click();
   await expect(page.getByText('ReqPilot Postman v2.1')).toBeVisible();
-  await page.keyboard.press('Escape');
 
   await page.getByRole('button', { name: 'Import' }).first().click();
   dialog = page.getByRole('dialog', { name: 'Import' });
@@ -23,9 +21,7 @@ test('can import postman and openapi files and show warning for invalid', async 
   await expect(page.getByText('Found')).toBeVisible();
   await dialog.getByTestId('import-confirm').click();
 
-  await page.getByRole('button', { name: 'Collections' }).click();
   await expect(page.getByText('OpenAPI 3')).toBeVisible();
-  await page.keyboard.press('Escape');
 
   await page.getByRole('button', { name: 'Import' }).first().click();
   dialog = page.getByRole('dialog', { name: 'Import' });

@@ -1,18 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root,
 .theme-dark {
-  --bg-primary: #0c0c0c;
-  --bg-secondary: #111111;
-  --bg-tertiary: #161616;
-  --border: #1a1a1a;
-  --border-hover: #2a2a2a;
-  --text-primary: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --text-muted: #a3a3ad;
-  --text-dimmed: #333333;
-  --surface: #1a1a1a;
-  --focus-ring: #60a5fa;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f3f4f6;
+  --border: #e5e7eb;
+  --border-soft: #f3f4f6;
+  --border-hover: #d1d5db;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --text-dimmed: #c4cbd4;
+  --surface: #ffffff;
+  --surface-soft: #f9fafb;
+  --focus-ring: #6366f1;
+  --accent-primary: #6366f1;
+  --accent-text: #ffffff;
+  --accent-success: #22c55e;
 
   --method-get: #34d399;
   --method-post: #fbbf24;
@@ -27,27 +32,36 @@
   --status-4xx: #fbbf24;
   --status-5xx: #f87171;
 
-  --overlay: rgb(0 0 0 / 60%);
-  --editor-bg: #1a1a1a;
+  --overlay: rgb(15 23 42 / 20%);
+  --editor-bg: #ffffff;
 
-  --font-ui: 'Outfit', sans-serif;
-  --font-code: 'JetBrains Mono', monospace;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'DejaVu Sans Mono',
+    'Courier New', monospace;
+  --font-size-body: 0.75rem;
+  --font-size-tiny: 0.625rem;
+  --line-height-body: 1rem;
 }
 
 .theme-light {
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f8fa;
-  --bg-tertiary: #f0f0f3;
-  --border: #e2e2e8;
-  --border-hover: #c8c8d0;
-  --text-primary: #1a1a2e;
-  --text-secondary: #52525b;
-  --text-muted: #71717a;
-  --text-dimmed: #b0b0be;
-  --surface: #eeeef2;
-  --focus-ring: #2563eb;
-  --overlay: rgb(24 24 27 / 30%);
-  --editor-bg: #f0f0f3;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f3f4f6;
+  --border: #e5e7eb;
+  --border-soft: #f3f4f6;
+  --border-hover: #d1d5db;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --text-dimmed: #c4cbd4;
+  --surface: #ffffff;
+  --surface-soft: #f9fafb;
+  --focus-ring: #6366f1;
+  --accent-primary: #6366f1;
+  --accent-text: #ffffff;
+  --accent-success: #22c55e;
+  --overlay: rgb(15 23 42 / 20%);
+  --editor-bg: #ffffff;
 }
 
 * {
@@ -65,6 +79,10 @@ body {
   font-family: var(--font-ui);
   background: var(--bg-primary);
   color: var(--text-primary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -121,37 +139,39 @@ button {
 }
 
 .json-key {
-  color: var(--method-put);
+  color: #5669d8;
 }
 
 .json-string {
-  color: var(--method-get);
+  color: #35a16e;
 }
 
 .json-number {
-  color: var(--method-post);
+  color: #ae7d1f;
 }
 
 .json-bool {
-  color: var(--method-patch);
+  color: #8b5ec8;
 }
 
 .json-null {
-  color: var(--method-delete);
+  color: #d05a67;
 }
 
 ::-webkit-scrollbar {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-hover);
-  border-radius: 0.5rem;
+  background: var(--border);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 @media (prefers-reduced-motion: no-preference) {

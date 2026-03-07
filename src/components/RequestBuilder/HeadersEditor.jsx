@@ -12,5 +12,5 @@ const HEADER_SUGGESTIONS = [
 ];
 
 export function HeadersEditor({ rows, onChange }) {
-  return <KeyValueEditor label="Headers" rows={rows} onChange={onChange} keySuggestions={HEADER_SUGGESTIONS} />;
+  return <KeyValueEditor label="Header List" mode="headers" rows={rows} onChange={onChange} keySuggestions={HEADER_SUGGESTIONS} />;
 }

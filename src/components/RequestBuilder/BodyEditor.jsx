@@ -13,6 +13,7 @@ export function BodyEditor({ body, onChange }) {
   const [error, setError] = useState('');
 
   const lineNumbers = useMemo(() => toLineNumbers(body.raw || ''), [body.raw]);
+  const isEmptyBody = body.type === 'none';
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -33,45 +34,76 @@ export function BodyEditor({ body, onChange }) {
 
   return (
     <div className={styles.bodyEditor}>
-      <label htmlFor="body-type">Body type</label>
-      <select
-        id="body-type"
-        value={body.type}
-        onChange={(event) => onChange({ ...body, type: event.target.value })}
-        aria-haspopup="listbox"
-      >
-        {BODY_TYPES.map((type) => (
-          <option key={type} value={type}>
-            {type}
-          </option>
-        ))}
-      </select>
-
-      {(body.type === 'json' || body.type === 'raw') && (
-        <div className={styles.editorWrap}>
-          <pre className={styles.lineNumbers} aria-hidden="true">
-            {lineNumbers}
-          </pre>
-          <textarea
-            className={error ? styles.textareaError : styles.textarea}
-            value={body.raw || ''}
-            onChange={(event) => onChange({ ...body, raw: event.target.value })}
-            placeholder={body.type === 'json' ? '{\n  "key": "value"\n}' : 'Raw body'}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? 'body-json-error' : undefined}
-          />
+      <header className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>Content Type</h3>
+        <div className={styles.bodyControls}>
+          <select
+            id="body-type"
+            className={styles.inlineSelect}
+            value={body.type}
+            onChange={(event) => onChange({ ...body, type: event.target.value })}
+            aria-haspopup="listbox"
+          >
+            {BODY_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {type === 'none' ? 'None' : type}
+              </option>
+            ))}
+          </select>
+          <button className={styles.overrideButton} type="button">
+            Override
+          </button>
         </div>
-      )}
+      </header>
 
-      {(body.type === 'form-data' || body.type === 'x-www-form-urlencoded') && (
-        <KeyValueEditor label="Body" rows={body.form || []} onChange={(rows) => onChange({ ...body, form: rows })} />
-      )}
+      <div className={styles.bodyContent}>
+        {isEmptyBody ? (
+          <div className={styles.bodyEmpty}>
+            <div className={styles.bodyEmptyIcon} aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="1.35em" height="1.35em" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3h7v7" />
+                <path d="M10 14 21 3" />
+                <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+              </svg>
+            </div>
+            <p>This request does not have a body</p>
+            <button className={styles.docButton} type="button">
+              Documentation
+            </button>
+          </div>
+        ) : null}
 
-      {error && (
-        <p id="body-json-error" className={styles.error} role="status" aria-live="polite">
-          Invalid JSON: {error}
-        </p>
-      )}
+        {(body.type === 'json' || body.type === 'raw') && !isEmptyBody && (
+          <div className={styles.editorWrap}>
+            <pre className={styles.lineNumbers} aria-hidden="true">
+              {lineNumbers}
+            </pre>
+            <textarea
+              className={error ? styles.textareaError : styles.textarea}
+              value={body.raw || ''}
+              onChange={(event) => onChange({ ...body, raw: event.target.value })}
+              placeholder={body.type === 'json' ? '{\n  "key": "value"\n}' : 'Raw body'}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'body-json-error' : undefined}
+            />
+          </div>
+        )}
+
+        {(body.type === 'form-data' || body.type === 'x-www-form-urlencoded') && !isEmptyBody && (
+          <KeyValueEditor
+            label="Body Fields"
+            mode="body"
+            rows={body.form || []}
+            onChange={(rows) => onChange({ ...body, form: rows })}
+          />
+        )}
+
+        {error && (
+          <p id="body-json-error" className={styles.error} role="status" aria-live="polite">
+            Invalid JSON: {error}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

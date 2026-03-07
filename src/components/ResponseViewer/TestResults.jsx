@@ -2,7 +2,7 @@ import styles from './ResponseViewer.module.css';
 
 export function TestResults({ tests = [] }) {
   if (!tests.length) {
-    return <p className={styles.empty}>Add tests in the Tests tab to validate responses</p>;
+    return <p className={styles.empty}>Add scripts to validate responses and see test results here</p>;
   }
 
   const passed = tests.filter((test) => test.pass).length;
