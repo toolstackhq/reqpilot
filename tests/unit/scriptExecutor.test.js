@@ -31,7 +31,9 @@ describe('scriptExecutor', () => {
     const result = executeScript({
       script: `
         rp.test('greater', () => rp.expect(10).toBeGreaterThan(5));
+        rp.test('greaterOrEqual', () => rp.expect(5).toBeGreaterThanOrEqual(5));
         rp.test('less', () => rp.expect(3).toBeLessThan(4));
+        rp.test('lessOrEqual', () => rp.expect(4).toBeLessThanOrEqual(4));
         rp.test('property', () => rp.expect({a:1}).toHaveProperty('a'));
         rp.test('contain', () => rp.expect([1,2,3]).toContain(2));
         rp.test('truthy', () => rp.expect(1).toBeTruthy());

@@ -91,6 +91,7 @@ describe('request flow integration', () => {
     const post = executeScript({
       script: `
         const body = rp.response.json();
+        rp.test('post-status', () => rp.expect(rp.response.status).toBe(200));
         rp.env.set('token', body.token);
       `,
       phase: 'post-request',
@@ -100,6 +101,7 @@ describe('request flow integration', () => {
     });
 
     expect(tests.testResults[0].pass).toBe(true);
+    expect(post.testResults[0].pass).toBe(true);
     expect(post.environment.token).toBe('jwt-token-xyz-123');
   });
 

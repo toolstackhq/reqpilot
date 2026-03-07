@@ -29,6 +29,11 @@ function withResolvedVariables(request, variables) {
 function applyAuth(request) {
   const next = structuredClone(request);
   const auth = request.auth || { type: 'none' };
+  const enabled = auth.enabled !== false;
+
+  if (!enabled || auth.type === 'none') {
+    return next;
+  }
 
   if (auth.type === 'bearer' && auth.token) {
     next.headers.push({ id: `auth-${Date.now()}`, key: 'Authorization', value: `Bearer ${auth.token}`, enabled: true });
@@ -104,7 +109,7 @@ export function useRequestSender({ variables, updateVariable, proxyEndpoint = '/
 
     return {
       ...response,
-      testResults: tests.testResults,
+      testResults: [...(tests.testResults || []), ...(post.testResults || [])],
       logs: [...pre.logs, ...tests.logs, ...post.logs],
       request: pre.request,
     };

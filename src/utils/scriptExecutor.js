@@ -16,9 +16,19 @@ function createExpect(value) {
         throw createAssertionError(`Expected ${value} to be greater than ${expected}`);
       }
     },
+    toBeGreaterThanOrEqual(expected) {
+      if (!(value >= expected)) {
+        throw createAssertionError(`Expected ${value} to be greater than or equal to ${expected}`);
+      }
+    },
     toBeLessThan(expected) {
       if (!(value < expected)) {
         throw createAssertionError(`Expected ${value} to be less than ${expected}`);
+      }
+    },
+    toBeLessThanOrEqual(expected) {
+      if (!(value <= expected)) {
+        throw createAssertionError(`Expected ${value} to be less than or equal to ${expected}`);
       }
     },
     toHaveProperty(property) {
