@@ -138,14 +138,12 @@
 }
 
 .railButtonFuture {
-  opacity: 0.45;
-  cursor: not-allowed;
+  opacity: 0.72;
+  cursor: pointer;
 }
 
-.railButtonFuture:disabled:hover {
-  background: transparent;
-  border-color: var(--border-soft);
-  color: var(--text-secondary);
+.railButtonFuture:hover {
+  opacity: 1;
 }
 
 .centerArea {
@@ -289,6 +287,67 @@
   color: var(--text-muted);
   font-size: 0.6875rem;
   padding: 0.3rem 0.5rem;
+}
+
+.envStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.envName {
+  color: var(--focus-ring);
+  font-weight: 700;
+}
+
+.envChangeButton {
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 0.3rem;
+  font-size: 0.625rem;
+  padding: 0.02rem 0.32rem;
+}
+
+.envChangeButton:hover {
+  border-color: var(--border);
+  color: var(--text-primary);
+  background: var(--surface-soft);
+}
+
+.envVars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.envVarResolved,
+.envVarMissing,
+.envVarMore {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.04rem 0.38rem;
+  font-family: var(--font-code);
+  font-size: 0.625rem;
+  line-height: 1.2;
+}
+
+.envVarResolved {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.envVarMissing {
+  color: #b91c1c;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.envVarMore {
+  color: var(--text-secondary);
+  border-color: var(--border);
+  background: var(--surface-soft);
 }
 
 .statusSpacer {

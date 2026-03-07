@@ -1,3 +1,4 @@
+import { useMemo, useRef } from 'react';
 import styles from './RequestBuilder.module.css';
 
 const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
@@ -15,7 +16,42 @@ function methodClass(method) {
   return `method${method}`;
 }
 
-export function UrlBar({ request, onChange, onSend, onSave, isSending, elapsedMs }) {
+function tokenizeUrl(value, variableValues = {}) {
+  if (!value) return [];
+
+  const tokens = [];
+  const pattern = /\{\{\s*([^{}]+?)\s*\}\}/g;
+  let cursor = 0;
+  let match = pattern.exec(value);
+
+  while (match) {
+    if (match.index > cursor) {
+      tokens.push({ text: value.slice(cursor, match.index), type: 'plain' });
+    }
+
+    const variableName = match[1].trim();
+    const resolved = variableName && Object.prototype.hasOwnProperty.call(variableValues, variableName);
+    tokens.push({ text: match[0], type: resolved ? 'resolved' : 'missing' });
+    cursor = match.index + match[0].length;
+    match = pattern.exec(value);
+  }
+
+  if (cursor < value.length) {
+    tokens.push({ text: value.slice(cursor), type: 'plain' });
+  }
+
+  return tokens;
+}
+
+export function UrlBar({ request, onChange, onSend, onSave, isSending, elapsedMs, variableValues = {} }) {
+  const highlightRef = useRef(null);
+  const urlTokens = useMemo(() => tokenizeUrl(request.url || '', variableValues), [request.url, variableValues]);
+
+  function syncScroll(event) {
+    if (!highlightRef.current) return;
+    highlightRef.current.scrollLeft = event.target.scrollLeft;
+  }
+
   return (
     <div className={styles.urlBar}>
       <div className={styles.urlCombo}>
@@ -46,13 +82,36 @@ export function UrlBar({ request, onChange, onSend, onSave, isSending, elapsedMs
           <label className="sr-only" htmlFor="request-url-input">
             Request URL
           </label>
+          <div className={styles.urlInputWrap}>
+            <div className={styles.urlInputHighlight} ref={highlightRef} aria-hidden="true">
+              {urlTokens.length ? (
+                urlTokens.map((token, index) => (
+                  <span
+                    key={`${token.type}-${index}-${token.text.length}`}
+                    className={
+                      token.type === 'resolved'
+                        ? styles.urlTokenResolved
+                        : token.type === 'missing'
+                          ? styles.urlTokenMissing
+                          : styles.urlTokenPlain
+                    }
+                  >
+                    {token.text}
+                  </span>
+                ))
+              ) : (
+                <span className={styles.urlPlaceholder}>Enter a URL or paste a cURL command</span>
+              )}
+            </div>
           <input
             id="request-url-input"
             className={styles.urlInput}
             value={request.url}
             onChange={(event) => onChange({ type: 'url', value: event.target.value })}
-            placeholder="Enter a URL or paste a cURL command"
+            placeholder=""
+            onScroll={syncScroll}
           />
+          </div>
         </div>
       </div>
 

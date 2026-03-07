@@ -4,9 +4,11 @@ import { RequestBuilder } from './components/RequestBuilder/RequestBuilder.jsx';
 import { ResponseViewer } from './components/ResponseViewer/ResponseViewer.jsx';
 import { History } from './components/Sidebar/History.jsx';
 import { Collections } from './components/Sidebar/Collections.jsx';
+import { EnvManager } from './components/Environment/EnvManager.jsx';
 import { ThemeToggle } from './components/ThemeToggle/ThemeToggle.jsx';
 import { ImportModal } from './components/Import/ImportModal.jsx';
 import { SaveRequestModal } from './components/SaveRequest/SaveRequestModal.jsx';
+import { ComingSoonModal } from './components/ComingSoon/ComingSoonModal.jsx';
 import { CommandPalette } from './components/CommandPalette/CommandPalette.jsx';
 import { useTheme } from './hooks/useTheme.js';
 import { useHistory } from './hooks/useHistory.js';
@@ -63,6 +65,30 @@ function createRequestTab(partial = {}) {
   };
 }
 
+function collectTemplateVariables(value, target = new Set()) {
+  if (typeof value === 'string') {
+    const pattern = /\{\{\s*([^{}]+?)\s*\}\}/g;
+    let match = pattern.exec(value);
+    while (match) {
+      const key = match[1].trim();
+      if (key) target.add(key);
+      match = pattern.exec(value);
+    }
+    return target;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectTemplateVariables(entry, target));
+    return target;
+  }
+
+  if (value && typeof value === 'object') {
+    Object.values(value).forEach((entry) => collectTemplateVariables(entry, target));
+  }
+
+  return target;
+}
+
 export default function App() {
   const [requestTabs, setRequestTabs] = useState(() => [createRequestTab()]);
   const [activeTabId, setActiveTabId] = useState(null);
@@ -71,16 +97,23 @@ export default function App() {
   const [showImport, setShowImport] = useState(false);
   const [showSaveRequest, setShowSaveRequest] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showEnvManager, setShowEnvManager] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
+  const [comingSoonFeature, setComingSoonFeature] = useState(null);
   const [proxyStatus, setProxyStatus] = useState('checking');
 
   const { theme, toggleTheme } = useTheme();
   const { history, addHistory, clearHistory } = useHistory();
   const { collections, createCollection, saveRequestToCollection, importCollection } = useCollections();
   const {
+    environments,
+    activeId,
+    setActiveId,
     activeEnvironment,
     activeVariablesMap,
     upsertVariable,
+    createEnvironment,
+    updateActiveVariables,
     importEnvironment,
   } = useEnvironments();
 
@@ -207,7 +240,9 @@ export default function App() {
       if (event.key === 'Escape') {
         setShowImport(false);
         setShowHistory(false);
+        setShowEnvManager(false);
         setShowPalette(false);
+        setComingSoonFeature(null);
       }
 
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
@@ -303,6 +338,26 @@ export default function App() {
     return `${activeResponse.status} ${activeResponse.statusText}`;
   }, [activeResponse]);
 
+  const templateVariables = useMemo(
+    () => Array.from(collectTemplateVariables(activeRequest)).sort((a, b) => a.localeCompare(b)),
+    [activeRequest]
+  );
+
+  const variableResolution = useMemo(() => {
+    const resolved = [];
+    const missing = [];
+
+    for (const name of templateVariables) {
+      if (Object.prototype.hasOwnProperty.call(activeVariablesMap, name)) {
+        resolved.push(name);
+      } else {
+        missing.push(name);
+      }
+    }
+
+    return { resolved, missing };
+  }, [templateVariables, activeVariablesMap]);
+
   return (
     <div className={styles.appRoot}>
       <a className="skip-link" href="#main-content">
@@ -342,7 +397,7 @@ export default function App() {
             type="button"
             aria-label="gRPC coming soon"
             title="gRPC (coming soon)"
-            disabled
+            onClick={() => setComingSoonFeature('grpc')}
           >
             g
           </button>
@@ -351,7 +406,7 @@ export default function App() {
             type="button"
             aria-label="GraphQL coming soon"
             title="GraphQL (coming soon)"
-            disabled
+            onClick={() => setComingSoonFeature('graphql')}
           >
             G
           </button>
@@ -360,7 +415,7 @@ export default function App() {
             type="button"
             aria-label="WebSocket coming soon"
             title="WebSocket (coming soon)"
-            disabled
+            onClick={() => setComingSoonFeature('websocket')}
           >
             W
           </button>
@@ -407,6 +462,7 @@ export default function App() {
               onSave={onOpenSaveRequest}
               isSending={isSending}
               elapsedMs={elapsedMs}
+              variableValues={activeVariablesMap}
             />
           </section>
 
@@ -430,8 +486,16 @@ export default function App() {
         </section>
 
         <nav className={styles.rightRail} aria-label="Workspace tools">
-          <button className={styles.railButton} type="button" aria-label="Collections">
+          <button
+            className={styles.railButton}
+            type="button"
+            aria-label="Collections"
+            onClick={() => document.getElementById('collections-panel')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             ▦
+          </button>
+          <button className={styles.railButton} type="button" aria-label="Environments" onClick={() => setShowEnvManager(true)}>
+            ◎
           </button>
           <button className={styles.railButton} type="button" aria-label="History" onClick={() => setShowHistory(true)}>
             ◷
@@ -461,7 +525,31 @@ export default function App() {
       </main>
 
       <footer className={styles.statusBar}>
-        <span>Environment: {activeEnvironment?.name || 'none'}</span>
+        <span className={styles.envStatus}>
+          Environment: <span className={styles.envName}>{activeEnvironment?.name || 'none'}</span>
+          <button type="button" className={styles.envChangeButton} onClick={() => setShowEnvManager(true)}>
+            Change
+          </button>
+        </span>
+        {templateVariables.length ? (
+          <div className={styles.envVars} aria-label="Environment variable resolution">
+            {variableResolution.resolved.slice(0, 2).map((name) => (
+              <span
+                key={`ok-${name}`}
+                className={styles.envVarResolved}
+                title={`Resolved from ${activeEnvironment?.name || 'environment'}`}
+              >
+                {`{{${name}}}${activeVariablesMap[name] !== '' ? `=${String(activeVariablesMap[name]).slice(0, 12)}` : ''}`}
+              </span>
+            ))}
+            {variableResolution.missing.slice(0, 2).map((name) => (
+              <span key={`miss-${name}`} className={styles.envVarMissing} title="Missing environment variable">
+                {`{{${name}}}`}
+              </span>
+            ))}
+            {templateVariables.length > 4 ? <span className={styles.envVarMore}>+{templateVariables.length - 4}</span> : null}
+          </div>
+        ) : null}
         <span>Proxy: {proxyStatus}</span>
         <span>Mode: REST</span>
         <span>Version: 1.0.0</span>
@@ -503,6 +591,22 @@ export default function App() {
         />
       )}
 
+      {showEnvManager ? (
+        <EnvManager
+          environment={activeEnvironment}
+          environments={environments}
+          activeId={activeId}
+          onSelectEnvironment={setActiveId}
+          onClose={() => setShowEnvManager(false)}
+          onCreateEnvironment={createEnvironment}
+          onSaveVariables={updateActiveVariables}
+        />
+      ) : null}
+
+      {comingSoonFeature ? (
+        <ComingSoonModal feature={comingSoonFeature} onClose={() => setComingSoonFeature(null)} />
+      ) : null}
+
       {showPalette && (
         <CommandPalette
           onClose={() => setShowPalette(false)}
@@ -510,6 +614,7 @@ export default function App() {
             { id: 'send', label: 'Send Request', run: runSend },
             { id: 'save', label: 'Save Request', run: onOpenSaveRequest },
             { id: 'new-tab', label: 'New Request Tab', run: addNewRequestTab },
+            { id: 'env', label: 'Manage Environments', run: () => setShowEnvManager(true) },
             {
               id: 'collections',
               label: 'Focus Collections',

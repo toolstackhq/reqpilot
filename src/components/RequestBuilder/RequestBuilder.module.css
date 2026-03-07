@@ -39,6 +39,11 @@
   background: var(--surface-soft);
 }
 
+.urlInputWrap {
+  position: relative;
+  min-height: 2.2rem;
+}
+
 .methodSelect,
 .urlInput,
 .inlineSelect,
@@ -114,11 +119,56 @@
   font-size: 0.8125rem;
   font-weight: 500;
   background: transparent;
+  color: transparent;
+  caret-color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+}
+
+.urlInputHighlight {
+  position: absolute;
+  inset: 0;
+  padding: 0.25rem 0.72rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.65rem;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  color: var(--text-primary);
+  pointer-events: none;
+}
+
+.urlInputHighlight::-webkit-scrollbar {
+  display: none;
+}
+
+.urlPlaceholder {
+  color: var(--text-muted);
+}
+
+.urlTokenPlain {
+  color: var(--text-primary);
+}
+
+.urlTokenResolved {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.urlTokenMissing {
+  color: #b91c1c;
+  font-weight: 600;
 }
 
 .urlInput::placeholder {
-  color: var(--text-muted);
-  font-weight: 500;
+  color: transparent;
+}
+
+.urlInput::selection {
+  background: rgb(99 102 241 / 24%);
+  color: transparent;
 }
 
 .sendGroup,

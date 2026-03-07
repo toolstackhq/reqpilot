@@ -97,7 +97,7 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
   );
 }
 
-export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSending, elapsedMs }) {
+export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSending, elapsedMs, variableValues = {} }) {
   const [tab, setTab] = useState('Parameters');
 
   useEffect(() => {
@@ -161,6 +161,7 @@ export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSen
         onSave={onSave}
         isSending={isSending}
         elapsedMs={elapsedMs}
+        variableValues={variableValues}
       />
 
       <nav className={styles.tabs} role="tablist" aria-label="Request tabs">
