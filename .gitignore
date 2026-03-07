@@ -3,3 +3,5 @@ test-results/
 playwright-report/
 .vscode/
 .DS_Store
+tmp/
+h*.png
