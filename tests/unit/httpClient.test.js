@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { buildProxyPayload } from '../../src/utils/httpClient.js';
 
 describe('httpClient', () => {
-  test('builds payload and strips disabled headers', () => {
+  test('builds payload, strips disabled headers, and keeps explicit headers', () => {
     const payload = buildProxyPayload({
       method: 'POST',
       url: 'http://localhost:4444/api/users',
@@ -13,7 +13,7 @@ describe('httpClient', () => {
       body: { type: 'json', raw: '{"name":"John"}', form: [] },
     });
 
-    expect(payload.headers).toEqual({ 'Content-Type': 'application/json' });
+    expect(payload.headers).toEqual({ 'Content-Type': 'application/json', Accept: '*/*' });
     expect(payload.body).toBe('{"name":"John"}');
   });
 
@@ -32,6 +32,8 @@ describe('httpClient', () => {
     });
 
     expect(payload.body).toBe('foo=bar&baz=qux');
+    expect(payload.headers['Content-Type']).toBe('application/x-www-form-urlencoded');
+    expect(payload.headers.Accept).toBe('*/*');
   });
 
   test('empty body for GET', () => {
@@ -43,5 +45,30 @@ describe('httpClient', () => {
     });
 
     expect(payload.body).toBe('');
+    expect(payload.headers).toEqual({ Accept: '*/*' });
+  });
+
+  test('adds default json content-type and accept when user did not provide headers', () => {
+    const payload = buildProxyPayload({
+      method: 'POST',
+      url: 'http://localhost:4444/api/users',
+      headers: [],
+      body: { type: 'json', raw: '{"hello":"world"}', form: [] },
+    });
+
+    expect(payload.headers['Content-Type']).toBe('application/json');
+    expect(payload.headers.Accept).toBe('*/*');
+  });
+
+  test('does not override user supplied accept header', () => {
+    const payload = buildProxyPayload({
+      method: 'POST',
+      url: 'http://localhost:4444/api/users',
+      headers: [{ key: 'accept', value: 'application/json', enabled: true }],
+      body: { type: 'json', raw: '{"hello":"world"}', form: [] },
+    });
+
+    expect(payload.headers.accept).toBe('application/json');
+    expect(payload.headers.Accept).toBeUndefined();
   });
 });
