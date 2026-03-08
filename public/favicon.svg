@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="REQPILOT icon">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f766e" />
+      <stop offset="1" stop-color="#0ea5a4" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)" />
+  <path d="M20 18h15c6 0 10 4 10 9c0 4-2 7-6 8l6 11h-8l-5-10h-4v10h-8zm8 7v6h7c2 0 3-1 3-3s-1-3-3-3z" fill="#eafffb" />
+</svg>
+
