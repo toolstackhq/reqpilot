@@ -21,7 +21,7 @@ test('can send POST JSON and use headers/auth/params', async ({ page }) => {
   await page.getByRole('button', { name: 'Send' }).click();
 
   await expect(page.getByTestId('response-status')).toContainText('201');
-  await expect(page.getByText('E2E')).toBeVisible();
+  await expect(page.locator('[aria-label="Response Viewer"]')).toContainText('E2E');
 
   await page.selectOption('#request-method', 'GET');
   await page.fill('#request-url-input', 'http://localhost:4444/api/echo/params?foo=bar');
