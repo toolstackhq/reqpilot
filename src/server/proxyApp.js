@@ -1,4 +1,6 @@
 import express from 'express';
+import http from 'node:http';
+import https from 'node:https';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 
@@ -8,11 +10,11 @@ function sanitizeHeaders(headers = {}) {
   );
 }
 
-export async function executeProxyRequest({ method, url, headers, body }) {
+export async function executeProxyRequest({ method, url, headers, body, security }) {
   const start = performance.now();
   let parsedUrl;
   try {
-    parsedUrl = new URL(url).toString();
+    parsedUrl = new URL(url);
   } catch {
     return {
       ok: false,
@@ -26,44 +28,76 @@ export async function executeProxyRequest({ method, url, headers, body }) {
     };
   }
 
-  try {
+  return new Promise((resolve) => {
     const reqHeaders = sanitizeHeaders(headers);
-    const fetchOpts = {
-      method: method || 'GET',
+    const normalizedMethod = (method || 'GET').toUpperCase();
+    const hasBody = !['GET', 'HEAD'].includes(normalizedMethod) && body !== undefined && body !== null && body !== '';
+    const requestBody = hasBody ? (typeof body === 'string' ? body : JSON.stringify(body)) : '';
+    const isHttps = parsedUrl.protocol === 'https:';
+    const transport = isHttps ? https : http;
+    const verifySsl = security?.verifySsl !== false;
+
+    const requestOptions = {
+      protocol: parsedUrl.protocol,
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port || undefined,
+      method: normalizedMethod,
+      path: `${parsedUrl.pathname}${parsedUrl.search}`,
       headers: reqHeaders,
+      rejectUnauthorized: verifySsl,
     };
 
-    if (!['GET', 'HEAD'].includes((method || 'GET').toUpperCase()) && body !== undefined && body !== null && body !== '') {
-      fetchOpts.body = typeof body === 'string' ? body : JSON.stringify(body);
+    if (hasBody && !requestOptions.headers['Content-Length'] && !requestOptions.headers['content-length']) {
+      requestOptions.headers['Content-Length'] = Buffer.byteLength(requestBody, 'utf8');
     }
 
-    const response = await fetch(parsedUrl, fetchOpts);
-    const text = await response.text();
-    const responseHeaders = Object.fromEntries(response.headers.entries());
-    const time = Math.round(performance.now() - start);
+    const req = transport.request(requestOptions, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        const text = buffer.toString('utf8');
+        const responseHeaders = Object.fromEntries(
+          Object.entries(res.headers).map(([key, value]) => [key, Array.isArray(value) ? value.join(', ') : String(value ?? '')])
+        );
+        const time = Math.round(performance.now() - start);
 
-    return {
-      ok: true,
-      status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders,
-      body: text,
-      time,
-      size: Buffer.byteLength(text || '', 'utf8'),
-    };
-  } catch (error) {
-    const time = Math.round(performance.now() - start);
-    return {
-      ok: false,
-      error: error?.message || 'Request failed',
-      status: 502,
-      statusText: 'Bad Gateway',
-      headers: {},
-      body: '',
-      time,
-      size: 0,
-    };
-  }
+        resolve({
+          ok: true,
+          status: res.statusCode || 0,
+          statusText: res.statusMessage || '',
+          headers: responseHeaders,
+          body: text,
+          time,
+          size: buffer.length,
+        });
+      });
+    });
+
+    req.setTimeout(30000, () => {
+      req.destroy(new Error('Request timed out'));
+    });
+
+    req.on('error', (error) => {
+      const time = Math.round(performance.now() - start);
+      resolve({
+        ok: false,
+        error: error?.message || 'Request failed',
+        status: 502,
+        statusText: 'Bad Gateway',
+        headers: {},
+        body: '',
+        time,
+        size: 0,
+      });
+    });
+
+    if (hasBody) {
+      req.write(requestBody);
+    }
+
+    req.end();
+  });
 }
 
 export function createProxyApp({ staticDir } = {}) {
