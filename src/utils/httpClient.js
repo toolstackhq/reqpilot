@@ -85,6 +85,10 @@ export function buildProxyPayload(request, security = {}) {
     body,
     security: {
       verifySsl: security.verifySsl !== false,
+      ...(typeof security.ca === 'string' && security.ca.trim() ? { ca: security.ca.trim() } : {}),
+      ...(typeof security.cert === 'string' && security.cert.trim() ? { cert: security.cert.trim() } : {}),
+      ...(typeof security.key === 'string' && security.key.trim() ? { key: security.key.trim() } : {}),
+      ...(typeof security.passphrase === 'string' && security.passphrase ? { passphrase: security.passphrase } : {}),
     },
   };
 }

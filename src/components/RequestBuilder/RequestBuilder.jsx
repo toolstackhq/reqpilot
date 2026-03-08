@@ -99,15 +99,82 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
 
 function RequestSettingsPanel({ request, onChange }) {
   const sslMode = request.security?.sslVerification || 'inherit';
+  const security = request.security || {};
+  const [textEditMode, setTextEditMode] = useState({
+    ca: false,
+    cert: false,
+    key: false,
+  });
 
-  function setSslMode(value) {
+  function updateSecurity(patch) {
     onChange({
       ...request,
       security: {
-        ...(request.security || {}),
-        sslVerification: value,
+        ...security,
+        ...patch,
       },
     });
+  }
+
+  function setSslMode(value) {
+    updateSecurity({ sslVerification: value });
+  }
+
+  async function onUploadPem(field, file) {
+    if (!file) return;
+    const text = await file.text();
+    updateSecurity({ [field]: text });
+    setTextEditMode((prev) => ({ ...prev, [field]: false }));
+  }
+
+  function toggleTextEditor(field) {
+    setTextEditMode((prev) => ({ ...prev, [field]: !prev[field] }));
+  }
+
+  function clearPem(field) {
+    updateSecurity({ [field]: '' });
+    setTextEditMode((prev) => ({ ...prev, [field]: false }));
+  }
+
+  function renderPemField(field, label, accept, placeholder) {
+    const hasValue = Boolean((security[field] || '').trim());
+
+    return (
+      <label className={styles.settingsField}>
+        <span>{label}</span>
+        <div className={styles.settingsUploadRow}>
+          <label className={styles.settingsUploadButton}>
+            Upload file
+            <input
+              type="file"
+              accept={accept}
+              onChange={(event) => {
+                onUploadPem(field, event.target.files?.[0]);
+                event.target.value = '';
+              }}
+            />
+          </label>
+          <button type="button" className={styles.settingsGhostButton} onClick={() => toggleTextEditor(field)}>
+            {textEditMode[field] ? 'Hide text' : 'Edit as text'}
+          </button>
+          {hasValue ? (
+            <button type="button" className={styles.settingsGhostButton} onClick={() => clearPem(field)}>
+              Clear
+            </button>
+          ) : null}
+          <span className={styles.settingsUploadMeta}>{hasValue ? 'Loaded' : 'Empty'}</span>
+        </div>
+        {textEditMode[field] ? (
+          <textarea
+            className={styles.settingsTextarea}
+            value={security[field] || ''}
+            onChange={(event) => updateSecurity({ [field]: event.target.value })}
+            placeholder={placeholder}
+            spellCheck={false}
+          />
+        ) : null}
+      </label>
+    );
   }
 
   return (
@@ -134,6 +201,28 @@ function RequestSettingsPanel({ request, onChange }) {
             SSL verification disabled for this request. Use only for trusted development endpoints.
           </p>
         ) : null}
+
+        <div className={styles.settingsTlsBlock}>
+          <p className={styles.settingsBlockTitle}>TLS Certificates (Advanced)</p>
+          <p className={styles.settingsHelp}>
+            Upload PEM files. Use `Edit as text` only if you need to inspect or modify content.
+          </p>
+          {renderPemField('ca', 'CA Certificate (PEM)', '.pem,.crt,.cer,.txt', '-----BEGIN CERTIFICATE-----')}
+          {renderPemField('cert', 'Client Certificate (PEM)', '.pem,.crt,.cer,.txt', '-----BEGIN CERTIFICATE-----')}
+          {renderPemField('key', 'Client Private Key (PEM)', '.pem,.key,.txt', '-----BEGIN PRIVATE KEY-----')}
+
+          <label className={styles.settingsField}>
+            <span>Private Key Passphrase (optional)</span>
+            <input
+              type="password"
+              className={styles.inlineSelect}
+              value={security.passphrase || ''}
+              onChange={(event) => updateSecurity({ passphrase: event.target.value })}
+              placeholder="passphrase"
+              autoComplete="off"
+            />
+          </label>
+        </div>
       </div>
     </div>
   );

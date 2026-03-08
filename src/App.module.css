@@ -119,6 +119,11 @@
   padding: 0.42rem 0.26rem;
 }
 
+.leftRail {
+  gap: 0.42rem;
+  padding: 0.42rem 0.26rem;
+}
+
 .railButton {
   width: 2.35rem;
   height: 2.35rem;
@@ -133,6 +138,19 @@
   place-items: center;
 }
 
+.railModeButton {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.72rem;
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+  font-size: 1.02rem;
+  letter-spacing: normal;
+  font-weight: 700;
+  padding: 0;
+  min-height: 0;
+}
+
 .railButton:hover {
   background: var(--surface-soft);
   border-color: var(--border-hover);
@@ -144,6 +162,22 @@
   background: var(--active-surface);
   border-color: var(--active-border);
   color: var(--active-text);
+}
+
+.railModeRest {
+  color: var(--method-get);
+}
+
+.railModeGrpc {
+  color: var(--method-put);
+}
+
+.railModeGraphql {
+  color: var(--method-post);
+}
+
+.railModeWs {
+  color: var(--method-patch);
 }
 
 .railButtonFuture {

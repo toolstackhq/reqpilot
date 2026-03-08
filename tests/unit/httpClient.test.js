@@ -71,4 +71,28 @@ describe('httpClient', () => {
     expect(payload.headers.accept).toBe('application/json');
     expect(payload.headers.Accept).toBeUndefined();
   });
+
+  test('forwards tls materials in security payload when present', () => {
+    const payload = buildProxyPayload(
+      {
+        method: 'GET',
+        url: 'https://localhost:4444/secure',
+        headers: [],
+        body: { type: 'none', raw: '', form: [] },
+      },
+      {
+        verifySsl: true,
+        ca: '  -----BEGIN CERTIFICATE-----A  ',
+        cert: '  -----BEGIN CERTIFICATE-----B  ',
+        key: '  -----BEGIN PRIVATE KEY-----C  ',
+        passphrase: 'secret',
+      }
+    );
+
+    expect(payload.security.verifySsl).toBe(true);
+    expect(payload.security.ca).toContain('BEGIN CERTIFICATE');
+    expect(payload.security.cert).toContain('BEGIN CERTIFICATE');
+    expect(payload.security.key).toContain('BEGIN PRIVATE KEY');
+    expect(payload.security.passphrase).toBe('secret');
+  });
 });

@@ -57,6 +57,10 @@ function createDefaultRequest() {
     },
     security: {
       sslVerification: 'inherit',
+      ca: '',
+      cert: '',
+      key: '',
+      passphrase: '',
     },
   };
 }
@@ -397,7 +401,7 @@ export default function App() {
       <main id="main-content" className={styles.main} ref={mainRef} tabIndex={-1}>
         <nav className={styles.leftRail} aria-label="Primary sections">
           <button
-            className={`${styles.railButton} ${apiMode === 'rest' ? styles.railButtonActive : ''}`}
+            className={`${styles.railButton} ${styles.railModeRest} ${apiMode === 'rest' ? styles.railButtonActive : ''}`}
             type="button"
             aria-label="REST requests"
             title="REST (active)"
@@ -409,7 +413,7 @@ export default function App() {
             R
           </button>
           <button
-            className={`${styles.railButton} ${styles.railButtonFuture}`}
+            className={`${styles.railButton} ${styles.railModeGrpc} ${styles.railButtonFuture}`}
             type="button"
             aria-label="gRPC coming soon"
             title="gRPC (coming soon)"
@@ -418,7 +422,7 @@ export default function App() {
             g
           </button>
           <button
-            className={`${styles.railButton} ${styles.railButtonFuture}`}
+            className={`${styles.railButton} ${styles.railModeGraphql} ${styles.railButtonFuture}`}
             type="button"
             aria-label="GraphQL coming soon"
             title="GraphQL (coming soon)"
@@ -427,7 +431,7 @@ export default function App() {
             G
           </button>
           <button
-            className={`${styles.railButton} ${styles.railButtonFuture}`}
+            className={`${styles.railButton} ${styles.railModeWs} ${styles.railButtonFuture}`}
             type="button"
             aria-label="WebSocket coming soon"
             title="WebSocket (coming soon)"

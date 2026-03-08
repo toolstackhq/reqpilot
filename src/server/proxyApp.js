@@ -36,6 +36,10 @@ export async function executeProxyRequest({ method, url, headers, body, security
     const isHttps = parsedUrl.protocol === 'https:';
     const transport = isHttps ? https : http;
     const verifySsl = security?.verifySsl !== false;
+    const ca = typeof security?.ca === 'string' && security.ca.trim() ? security.ca : undefined;
+    const cert = typeof security?.cert === 'string' && security.cert.trim() ? security.cert : undefined;
+    const key = typeof security?.key === 'string' && security.key.trim() ? security.key : undefined;
+    const passphrase = typeof security?.passphrase === 'string' ? security.passphrase : undefined;
 
     const requestOptions = {
       protocol: parsedUrl.protocol,
@@ -45,6 +49,10 @@ export async function executeProxyRequest({ method, url, headers, body, security
       path: `${parsedUrl.pathname}${parsedUrl.search}`,
       headers: reqHeaders,
       rejectUnauthorized: verifySsl,
+      ca,
+      cert,
+      key,
+      passphrase,
     };
 
     if (hasBody && !requestOptions.headers['Content-Length'] && !requestOptions.headers['content-length']) {

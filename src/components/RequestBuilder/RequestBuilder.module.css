@@ -394,6 +394,89 @@
   font-size: 0.69rem;
 }
 
+.settingsTlsBlock {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.72rem;
+  background: var(--surface);
+  padding: 0.62rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.settingsBlockTitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.settingsTextarea {
+  width: 100%;
+  min-height: 5.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.62rem;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  padding: 0.44rem 0.5rem;
+  resize: vertical;
+}
+
+.settingsUploadRow {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.settingsUploadButton {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 0.56rem;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.69rem;
+  font-weight: 700;
+  padding: 0.22rem 0.45rem;
+  cursor: pointer;
+}
+
+.settingsUploadButton:hover {
+  background: var(--surface-soft);
+  color: var(--text-primary);
+}
+
+.settingsUploadButton input {
+  display: none;
+}
+
+.settingsGhostButton {
+  border: 1px solid var(--border);
+  border-radius: 0.56rem;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 0.2rem 0.42rem;
+}
+
+.settingsGhostButton:hover {
+  background: var(--surface-soft);
+  color: var(--text-primary);
+}
+
+.settingsUploadMeta {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.67rem;
+  font-family: var(--font-code);
+}
+
 .sectionHeader {
   position: sticky;
   top: 0;

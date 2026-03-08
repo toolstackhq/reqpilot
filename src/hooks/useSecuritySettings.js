@@ -56,6 +56,29 @@ function matchesHost(host, pattern) {
   return host === pattern;
 }
 
+function includeTlsMaterial(base, request = {}) {
+  const security = request.security || {};
+  const next = { ...base };
+
+  if (typeof security.ca === 'string' && security.ca.trim()) {
+    next.ca = security.ca.trim();
+  }
+
+  if (typeof security.cert === 'string' && security.cert.trim()) {
+    next.cert = security.cert.trim();
+  }
+
+  if (typeof security.key === 'string' && security.key.trim()) {
+    next.key = security.key.trim();
+  }
+
+  if (typeof security.passphrase === 'string' && security.passphrase) {
+    next.passphrase = security.passphrase;
+  }
+
+  return next;
+}
+
 export function useSecuritySettings() {
   const [settings, setSettings] = useState(() => (typeof window === 'undefined' ? DEFAULT_SETTINGS : loadSettings()));
 
@@ -113,22 +136,22 @@ export function useSecuritySettings() {
     const requestMode = request?.security?.sslVerification || 'inherit';
 
     if (requestMode === 'enabled') {
-      return { verifySsl: true, source: 'request' };
+      return includeTlsMaterial({ verifySsl: true, source: 'request' }, request);
     }
 
     if (requestMode === 'disabled') {
-      return { verifySsl: false, source: 'request' };
+      return includeTlsMaterial({ verifySsl: false, source: 'request' }, request);
     }
 
     const host = getHostFromUrl(request?.url || '');
     if (host) {
       const matched = sortedHostRules.find((rule) => matchesHost(host, rule.pattern));
       if (matched) {
-        return { verifySsl: matched.verifySsl !== false, source: 'host', host, pattern: matched.pattern };
+        return includeTlsMaterial({ verifySsl: matched.verifySsl !== false, source: 'host', host, pattern: matched.pattern }, request);
       }
     }
 
-    return { verifySsl: settings.verifySslByDefault !== false, source: 'global', host };
+    return includeTlsMaterial({ verifySsl: settings.verifySslByDefault !== false, source: 'global', host }, request);
   }
 
   return {
@@ -140,4 +163,3 @@ export function useSecuritySettings() {
     resolveRequestSecurity,
   };
 }
-
