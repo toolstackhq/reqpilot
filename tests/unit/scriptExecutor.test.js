@@ -68,6 +68,7 @@ describe('scriptExecutor', () => {
       script: `
         const body = rp.response.json();
         console.log('name', body.name);
+        console.warn('warn line');
         rp.test('status', () => rp.expect(rp.response.status).toBe(201));
       `,
       request: createRequest(),
@@ -76,6 +77,24 @@ describe('scriptExecutor', () => {
     });
 
     expect(result.logs[0]).toContain('name');
+    expect(result.logEntries[1].level).toBe('warn');
+    expect(result.testResults[0].pass).toBe(true);
+  });
+
+  test('variables set in env can be used as plain script identifiers', () => {
+    const result = executeScript({
+      script: `
+        rp.env.set('random_string', 'abc123');
+        console.log(random_string);
+        rp.test('plain identifier resolves', () => rp.expect(random_string).toBe('abc123'));
+      `,
+      request: createRequest(),
+      response: { status: 200, body: '{}', headers: {} },
+      environment: {},
+    });
+
+    expect(result.environment.random_string).toBe('abc123');
+    expect(result.logs[0]).toContain('abc123');
     expect(result.testResults[0].pass).toBe(true);
   });
 

@@ -112,6 +112,7 @@ export function useRequestSender({ variables, updateVariable, proxyEndpoint = '/
       ...response,
       testResults: [...(tests.testResults || []), ...(post.testResults || [])],
       logs: [...pre.logs, ...tests.logs, ...post.logs],
+      logEntries: [...(pre.logEntries || []), ...(tests.logEntries || []), ...(post.logEntries || [])],
       request: pre.request,
       security,
     };

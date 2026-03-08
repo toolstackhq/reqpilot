@@ -380,6 +380,150 @@
   line-height: 1.45;
 }
 
+.consoleSearchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem;
+}
+
+.consoleFilter {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.consoleLayout {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(10rem, 38%) minmax(10rem, 1fr);
+}
+
+.consoleList {
+  margin: 0;
+  padding: 0.48rem 0.58rem;
+  list-style: none;
+  overflow: auto;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in oklab, var(--surface) 98%, transparent);
+}
+
+.consoleDetails {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+
+.consoleMeta {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0.45rem 0.58rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.67rem;
+  color: var(--text-secondary);
+  background: color-mix(in oklab, var(--surface-soft) 70%, transparent);
+}
+
+.consoleMeta strong {
+  color: var(--text-primary);
+}
+
+.consoleEntries {
+  margin: 0;
+  padding: 0.48rem 0.58rem;
+  list-style: none;
+  overflow: auto;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.consoleEntry {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.62rem;
+  background: var(--surface);
+  padding: 0.42rem 0.5rem;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.34rem;
+  align-items: center;
+}
+
+.consoleEntryEmpty {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.consoleLevel {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 0.07rem 0.38rem;
+  font-size: 0.59rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.consoleLevelLog,
+.consoleLevelInfo {
+  color: var(--method-get);
+  border-color: color-mix(in oklab, var(--method-get) 26%, var(--border-soft));
+  background: color-mix(in oklab, var(--state-success-chip-bg) 80%, var(--surface));
+}
+
+.consoleLevelWarn {
+  color: var(--method-post);
+  border-color: color-mix(in oklab, var(--method-post) 28%, var(--border-soft));
+  background: color-mix(in oklab, var(--method-post) 12%, var(--surface));
+}
+
+.consoleLevelError {
+  color: var(--method-delete);
+  border-color: color-mix(in oklab, var(--method-delete) 30%, var(--border-soft));
+  background: color-mix(in oklab, var(--state-danger-chip-bg) 80%, var(--surface));
+}
+
+.consoleLevelDebug {
+  color: var(--method-patch);
+  border-color: color-mix(in oklab, var(--method-patch) 30%, var(--border-soft));
+  background: color-mix(in oklab, var(--method-patch) 12%, var(--surface));
+}
+
+.consolePhase {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 0.07rem 0.38rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.consoleTime {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  justify-self: end;
+}
+
+.consoleMessage {
+  grid-column: 1 / -1;
+  margin: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.52rem;
+  padding: 0.34rem 0.42rem;
+  background: var(--editor-bg);
+  color: var(--text-primary);
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  line-height: 1.38;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .historyStack {
   display: grid;
   gap: 0.65rem;

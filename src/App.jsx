@@ -3,6 +3,7 @@ import styles from './App.module.css';
 import { RequestBuilder } from './components/RequestBuilder/RequestBuilder.jsx';
 import { ResponseViewer } from './components/ResponseViewer/ResponseViewer.jsx';
 import { History } from './components/Sidebar/History.jsx';
+import { Console } from './components/Sidebar/Console.jsx';
 import { Collections } from './components/Sidebar/Collections.jsx';
 import { EnvManager } from './components/Environment/EnvManager.jsx';
 import { ThemeToggle } from './components/ThemeToggle/ThemeToggle.jsx';
@@ -13,6 +14,7 @@ import { CommandPalette } from './components/CommandPalette/CommandPalette.jsx';
 import { SecurityModal } from './components/Security/SecurityModal.jsx';
 import { useTheme } from './hooks/useTheme.js';
 import { useHistory } from './hooks/useHistory.js';
+import { useConsole } from './hooks/useConsole.js';
 import { useCollections } from './hooks/useCollections.js';
 import { useEnvironments } from './hooks/useEnvironments.js';
 import { useSecuritySettings } from './hooks/useSecuritySettings.js';
@@ -106,6 +108,7 @@ export default function App() {
   const [showImport, setShowImport] = useState(false);
   const [showSaveRequest, setShowSaveRequest] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showConsole, setShowConsole] = useState(false);
   const [showEnvManager, setShowEnvManager] = useState(false);
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
@@ -114,6 +117,7 @@ export default function App() {
 
   const { theme, toggleTheme } = useTheme();
   const { history, addHistory, clearHistory } = useHistory();
+  const { consoleEntries, addConsoleEntry, clearConsoleEntries } = useConsole();
   const { collections, createCollection, saveRequestToCollection, importCollection } = useCollections();
   const {
     environments,
@@ -234,6 +238,33 @@ export default function App() {
       request: structuredClone(activeRequest),
       response: result,
     });
+
+    const logEntries = (result.logEntries || []).length
+      ? result.logEntries
+      : (result.logs || []).map((message) => ({
+          level: 'log',
+          phase: 'script',
+          message,
+          timestamp: new Date().toISOString(),
+        }));
+
+    addConsoleEntry({
+      id: `console-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
+      timestamp: new Date().toISOString(),
+      request: {
+        method: result.request?.method || activeRequest.method,
+        url: result.request?.url || activeRequest.url,
+      },
+      response: {
+        status: result.status,
+        statusText: result.statusText,
+        time: result.time,
+        size: result.size,
+        error: result.error,
+      },
+      logEntries,
+      logs: result.logs || [],
+    });
   }
 
   useEffect(() => {
@@ -259,6 +290,7 @@ export default function App() {
       if (event.key === 'Escape') {
         setShowImport(false);
         setShowHistory(false);
+        setShowConsole(false);
         setShowEnvManager(false);
         setShowSecuritySettings(false);
         setShowPalette(false);
@@ -533,6 +565,15 @@ export default function App() {
           >
             H
           </button>
+          <button
+            className={styles.railButton}
+            type="button"
+            aria-label="Console"
+            title="Console"
+            onClick={() => setShowConsole(true)}
+          >
+            L
+          </button>
         </nav>
 
         <aside className={styles.collectionsPane} id="collections-panel" aria-label="Collections panel">
@@ -592,6 +633,15 @@ export default function App() {
           <button className={styles.overlay} type="button" aria-hidden="true" onClick={() => setShowHistory(false)} />
           <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label="History Drawer">
             <History history={history} onLoad={loadRequest} onClear={clearHistory} variableValues={activeVariablesMap} />
+          </aside>
+        </>
+      ) : null}
+
+      {showConsole ? (
+        <>
+          <button className={styles.overlay} type="button" aria-hidden="true" onClick={() => setShowConsole(false)} />
+          <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label="Console Drawer">
+            <Console entries={consoleEntries} onClear={clearConsoleEntries} />
           </aside>
         </>
       ) : null}
@@ -665,6 +715,11 @@ export default function App() {
               id: 'history',
               label: 'Open History',
               run: () => setShowHistory(true),
+            },
+            {
+              id: 'console',
+              label: 'Open Console',
+              run: () => setShowConsole(true),
             },
             { id: 'import', label: 'Open Import', run: () => setShowImport(true) },
           ]}

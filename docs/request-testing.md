@@ -66,6 +66,23 @@ const randomString = (length = 16) => {
 rp.env.set("random_string", randomString(16));
 ```
 
+### Use Generated Variable in Same Script + Log It
+
+```js
+const randomString = (length = 16) => {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+};
+
+rp.env.set("random_string", randomString(16));
+console.log(random_string);
+
+rp.test("body has property from variable", () => {
+  const body = rp.response.json();
+  rp.expect(body).toHaveProperty(random_string);
+});
+```
+
 ### Build Random JSON Request Body
 
 ```js
@@ -109,6 +126,13 @@ rp.test("token present", () => {
   rp.expect(Boolean(body?.token)).toBe(true);
 });
 ```
+
+## Console and Observability
+
+- Script `console.log`, `console.info`, `console.warn`, `console.error`, and `console.debug` are captured.
+- Logs show in:
+  - Response Viewer → **Script Console** for the current response
+  - Global **Console Drawer** for searchable request-by-request log history
 
 ## Built-in Snippet Catalog (UI)
 
