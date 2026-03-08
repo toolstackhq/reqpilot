@@ -10,4 +10,4 @@ Modern REST API client with a clean, fast workflow for request building, testing
 
 ## App Screenshot
 
-![ReqPilot application screenshot](./reqpilot.png)
+![ReqPilot application screenshot](./docs/public/reqpilot.png)

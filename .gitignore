@@ -7,7 +7,7 @@ tmp/
 h*.png
 dist/
 docs/.vitepress/dist/
-public/
+/public/
 reqpilot-final-prompt.md
 d
 d.jpg

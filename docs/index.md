@@ -5,6 +5,9 @@ hero:
   name: ReqPilot
   text: Modern REST API Testing
   tagline: A clean API client for requests, environments, scripts, security, and history.
+  image:
+    src: /reqpilot.png
+    alt: ReqPilot app screenshot
   actions:
     - theme: brand
       text: Get Started
@@ -31,3 +34,7 @@ ReqPilot is built for practical API work. It combines the speed of a local tool 
 <div class="rp-doc-callout">
 Use the navigation on the left to move through setup, feature guides, testing, and security.
 </div>
+
+## UI Preview
+
+![ReqPilot UI](/reqpilot.png)
