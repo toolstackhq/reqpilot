@@ -57,7 +57,7 @@ function applyAuth(request) {
   return next;
 }
 
-export function useRequestSender({ variables, updateVariable, proxyEndpoint = '/proxy' } = {}) {
+export function useRequestSender({ variables, updateVariable, proxyEndpoint = '/proxy', resolveSecurity } = {}) {
   const [isSending, setIsSending] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
 
@@ -81,7 +81,8 @@ export function useRequestSender({ variables, updateVariable, proxyEndpoint = '/
       environment: envStore,
     });
 
-    const response = await sendProxyRequest(pre.request, proxyEndpoint);
+    const security = typeof resolveSecurity === 'function' ? resolveSecurity(pre.request) : { verifySsl: true, source: 'global' };
+    const response = await sendProxyRequest(pre.request, proxyEndpoint, security);
 
     const tests = executeScript({
       script: request.scripts?.tests,
@@ -112,6 +113,7 @@ export function useRequestSender({ variables, updateVariable, proxyEndpoint = '/
       testResults: [...(tests.testResults || []), ...(post.testResults || [])],
       logs: [...pre.logs, ...tests.logs, ...post.logs],
       request: pre.request,
+      security,
     };
   }
 

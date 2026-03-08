@@ -7,7 +7,7 @@ import { BodyEditor } from './BodyEditor.jsx';
 import { AuthEditor } from './AuthEditor.jsx';
 import { parseParamsFromUrl, applyParamsToUrl } from '../../utils/urlSync.js';
 
-const TABS = ['Parameters', 'Body', 'Headers', 'Authorization', 'Pre-request Script', 'Post-request Script'];
+const TABS = ['Parameters', 'Body', 'Headers', 'Authorization', 'Settings', 'Pre-request Script', 'Post-request Script'];
 
 const SNIPPETS = {
   'Environment: Set an environment variable': "rp.env.set('key', 'value');",
@@ -93,6 +93,48 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
           ))}
         </div>
       </aside>
+    </div>
+  );
+}
+
+function RequestSettingsPanel({ request, onChange }) {
+  const sslMode = request.security?.sslVerification || 'inherit';
+
+  function setSslMode(value) {
+    onChange({
+      ...request,
+      security: {
+        ...(request.security || {}),
+        sslVerification: value,
+      },
+    });
+  }
+
+  return (
+    <div className={styles.settingsPanel}>
+      <header className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>Request Settings</h3>
+      </header>
+
+      <div className={styles.settingsBody}>
+        <label className={styles.settingsField}>
+          <span>SSL certificate verification</span>
+          <select value={sslMode} onChange={(event) => setSslMode(event.target.value)} className={styles.inlineSelect}>
+            <option value="inherit">Inherit workspace setting</option>
+            <option value="enabled">Always verify</option>
+            <option value="disabled">Disable verification</option>
+          </select>
+        </label>
+
+        <p className={styles.settingsHelp}>
+          Inherit uses host-level and global SSL policy from SSL & Security settings.
+        </p>
+        {sslMode === 'disabled' ? (
+          <p className={styles.settingsWarning}>
+            SSL verification disabled for this request. Use only for trusted development endpoints.
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -206,6 +248,7 @@ export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSen
           <BodyEditor body={request.body} onChange={(body) => onRequestChange({ ...request, body })} method={methodKey(request.method)} />
         )}
         {tab === 'Authorization' && <AuthEditor auth={request.auth} onChange={(auth) => onRequestChange({ ...request, auth })} />}
+        {tab === 'Settings' && <RequestSettingsPanel request={request} onChange={onRequestChange} />}
         {tab === 'Pre-request Script' && (
           <ScriptPanel
             id="pre-script"
