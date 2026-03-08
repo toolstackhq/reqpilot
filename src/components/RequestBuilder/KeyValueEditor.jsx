@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import styles from './RequestBuilder.module.css';
 
 function makeRow() {
@@ -43,11 +44,57 @@ function withDraftRow(rows = []) {
   return [...base, draft];
 }
 
+function rowsToBulkText(rows = []) {
+  return rows
+    .filter((row) => !isEmptyRow(row) && row.enabled !== false && row.key)
+    .map((row) => `${row.key}: ${row.value || ''}`.trimEnd())
+    .join('\n');
+}
+
+function parseBulkText(text = '') {
+  const lines = text
+    .split(/\r?\n/g)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return lines.map((line) => {
+    const colonIndex = line.indexOf(':');
+    const eqIndex = line.indexOf('=');
+    const hasColon = colonIndex >= 0;
+    const hasEq = eqIndex >= 0;
+    const splitIndex = hasColon && hasEq ? Math.min(colonIndex, eqIndex) : hasColon ? colonIndex : eqIndex;
+
+    if (splitIndex < 0) {
+      return {
+        id: makeRow().id,
+        key: line,
+        value: '',
+        enabled: true,
+      };
+    }
+
+    return {
+      id: makeRow().id,
+      key: line.slice(0, splitIndex).trim(),
+      value: line.slice(splitIndex + 1).trim(),
+      enabled: true,
+    };
+  }).filter((row) => row.key);
+}
+
 export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, keySuggestions = [], valueSuggestions = [] }) {
+  const supportsBulkEdit = mode === 'params' || mode === 'headers';
+  const [editorMode, setEditorMode] = useState('table');
+  const [bulkText, setBulkText] = useState(() => rowsToBulkText(rows));
   const effectiveRows = withDraftRow(rows);
 
   const showDescription = mode !== 'body';
   const showActions = mode !== 'headers';
+
+  useEffect(() => {
+    if (editorMode === 'bulk') return;
+    setBulkText(rowsToBulkText(rows));
+  }, [rows, editorMode]);
 
   function updateRow(index, field, value) {
     const updated = effectiveRows.map((row, rowIndex) =>
@@ -68,6 +115,20 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
 
   function clearRows() {
     onChange(withDraftRow([]));
+    setBulkText('');
+  }
+
+  function switchEditorMode(nextMode) {
+    if (!supportsBulkEdit || nextMode === editorMode) return;
+    if (nextMode === 'bulk') {
+      setBulkText(rowsToBulkText(rows));
+    }
+    setEditorMode(nextMode);
+  }
+
+  function updateBulkText(value) {
+    setBulkText(value);
+    onChange(withDraftRow(parseBulkText(value)));
   }
 
   return (
@@ -75,6 +136,26 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
       <header className={styles.sectionHeader}>
         <h3 className={styles.sectionTitle}>{label}</h3>
         <div className={styles.sectionActions}>
+          {supportsBulkEdit ? (
+            <div className={styles.modeSwitch}>
+              <button
+                type="button"
+                className={editorMode === 'table' ? styles.modeSwitchButtonActive : styles.modeSwitchButton}
+                onClick={() => switchEditorMode('table')}
+                aria-pressed={editorMode === 'table'}
+              >
+                Table
+              </button>
+              <button
+                type="button"
+                className={editorMode === 'bulk' ? styles.modeSwitchButtonActive : styles.modeSwitchButton}
+                onClick={() => switchEditorMode('bulk')}
+                aria-pressed={editorMode === 'bulk'}
+              >
+                Bulk Edit
+              </button>
+            </div>
+          ) : null}
           <button className={styles.iconButton} type="button" aria-label={`${label} help`}>
             <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
@@ -92,79 +173,93 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
           </button>
         </div>
       </header>
-      <table className={styles.kvTable}>
-        <caption className="sr-only">{label}</caption>
-        <thead>
-          <tr>
-            <th scope="col" className={styles.gripHeader}>
-              <span className="sr-only">Row</span>
-            </th>
-            <th scope="col">Key</th>
-            <th scope="col">Value</th>
-            {showDescription ? <th scope="col">Description</th> : null}
-            {showActions ? <th scope="col" className={styles.actionsHeader}>Action</th> : null}
-          </tr>
-        </thead>
-        <tbody>
-          {effectiveRows.map((row, index) => (
-            <tr key={row.id || index}>
-              <td className={styles.gripCell}>
-                <button type="button" className={styles.gripButton} aria-label={`Reorder ${label} row ${index + 1}`}>
-                  ⋮⋮
-                </button>
-              </td>
-              <td>
-                <input
-                  list={`${label}-keys`}
-                  value={row.key}
-                  placeholder="Key"
-                  onChange={(event) => updateRow(index, 'key', event.target.value)}
-                  aria-label={`${label} key`}
-                />
-              </td>
-              <td>
-                <input
-                  list={`${label}-values`}
-                  value={row.value}
-                  placeholder="Value"
-                  onChange={(event) => updateRow(index, 'value', event.target.value)}
-                  aria-label={`${label} value`}
-                />
-              </td>
-              {showDescription ? (
+      {editorMode === 'bulk' ? (
+        <div className={styles.bulkEditWrap}>
+          <p className={styles.bulkEditHint}>One entry per line. Use `key: value` or `key=value`.</p>
+          <textarea
+            className={styles.bulkEditTextarea}
+            value={bulkText}
+            onChange={(event) => updateBulkText(event.target.value)}
+            spellCheck={false}
+            placeholder="Content-Type: application/json&#10;X-Request-Id: req-123"
+            aria-label={`${label} bulk editor`}
+          />
+        </div>
+      ) : (
+        <table className={styles.kvTable}>
+          <caption className="sr-only">{label}</caption>
+          <thead>
+            <tr>
+              <th scope="col" className={styles.gripHeader}>
+                <span className="sr-only">Row</span>
+              </th>
+              <th scope="col">Key</th>
+              <th scope="col">Value</th>
+              {showDescription ? <th scope="col">Description</th> : null}
+              {showActions ? <th scope="col" className={styles.actionsHeader}>Action</th> : null}
+            </tr>
+          </thead>
+          <tbody>
+            {effectiveRows.map((row, index) => (
+              <tr key={row.id || index}>
+                <td className={styles.gripCell}>
+                  <button type="button" className={styles.gripButton} aria-label={`Reorder ${label} row ${index + 1}`}>
+                    ⋮⋮
+                  </button>
+                </td>
                 <td>
                   <input
-                    value={row.description || ''}
-                    placeholder="Description"
-                    onChange={(event) => updateRow(index, 'description', event.target.value)}
-                    aria-label={`${label} description`}
+                    list={`${label}-keys`}
+                    value={row.key}
+                    placeholder="Key"
+                    onChange={(event) => updateRow(index, 'key', event.target.value)}
+                    aria-label={`${label} key`}
                   />
                 </td>
-              ) : null}
-              {showActions ? (
-                <td className={styles.rowActions}>
-                  <button
-                    type="button"
-                    className={styles.actionOk}
-                    onClick={() => onChange(withDraftRow(effectiveRows))}
-                    aria-label={`Commit ${label} row ${index + 1}`}
-                  >
-                    <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                  </button>
-                  <button type="button" className={styles.actionDelete} onClick={() => removeRow(index)} aria-label={`Delete ${label} row ${index + 1}`}>
-                    <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 6 6 18" />
-                      <path d="m6 6 12 12" />
-                    </svg>
-                  </button>
+                <td>
+                  <input
+                    list={`${label}-values`}
+                    value={row.value}
+                    placeholder="Value"
+                    onChange={(event) => updateRow(index, 'value', event.target.value)}
+                    aria-label={`${label} value`}
+                  />
                 </td>
-              ) : null}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                {showDescription ? (
+                  <td>
+                    <input
+                      value={row.description || ''}
+                      placeholder="Description"
+                      onChange={(event) => updateRow(index, 'description', event.target.value)}
+                      aria-label={`${label} description`}
+                    />
+                  </td>
+                ) : null}
+                {showActions ? (
+                  <td className={styles.rowActions}>
+                    <button
+                      type="button"
+                      className={styles.actionOk}
+                      onClick={() => onChange(withDraftRow(effectiveRows))}
+                      aria-label={`Commit ${label} row ${index + 1}`}
+                    >
+                      <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                    <button type="button" className={styles.actionDelete} onClick={() => removeRow(index)} aria-label={`Delete ${label} row ${index + 1}`}>
+                      <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </svg>
+                    </button>
+                  </td>
+                ) : null}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {!!keySuggestions.length && (
         <datalist id={`${label}-keys`}>
           {keySuggestions.map((entry) => (

@@ -2,17 +2,20 @@
   height: 100%;
   display: grid;
   grid-template-rows: auto auto 1fr;
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 .urlBar {
+  position: sticky;
+  top: 0;
+  z-index: 7;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  gap: 0.62rem;
+  padding: 0.7rem 0.82rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface-soft) 85%, transparent), transparent);
 }
 
 .urlCombo {
@@ -20,23 +23,24 @@
   display: flex;
   align-items: stretch;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 0.76rem;
   overflow: hidden;
-  background: var(--surface-soft);
+  background: var(--surface);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 24%);
 }
 
 .methodField {
   position: relative;
   display: flex;
-  flex: 0 0 6rem;
-  border-right: 1px solid var(--border);
-  background: var(--surface-soft);
+  flex: 0 0 5.35rem;
+  border-right: 1px solid var(--border-soft);
+  background: color-mix(in oklab, var(--surface-soft) 65%, transparent);
 }
 
 .urlField {
   flex: 1 1 auto;
   min-width: 0;
-  background: var(--surface-soft);
+  background: var(--surface);
 }
 
 .urlInputWrap {
@@ -54,7 +58,7 @@
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-primary);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 }
 
 .methodSelect,
@@ -67,18 +71,19 @@
 .methodSelect {
   width: 100%;
   appearance: none;
-  font-weight: 600;
-  padding: 0.25rem 1.45rem 0.25rem 0.85rem;
-  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 1.65rem 0.25rem 0.9rem;
+  font-size: 0.7rem;
   background: transparent;
   text-align: center;
   text-align-last: center;
+  letter-spacing: 0.02em;
 }
 
 .methodCaret {
   position: absolute;
   top: 50%;
-  right: 0.38rem;
+  right: 0.45rem;
   transform: translateY(-50%);
   color: var(--text-muted);
   display: inline-flex;
@@ -115,9 +120,9 @@
 
 .urlInput {
   width: 100%;
-  padding: 0.25rem 0.72rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 600;
   background: transparent;
   color: transparent;
   caret-color: var(--text-primary);
@@ -128,10 +133,10 @@
 .urlInputHighlight {
   position: absolute;
   inset: 0;
-  padding: 0.25rem 0.72rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1.65rem;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.56rem;
   white-space: pre;
   overflow-x: auto;
   overflow-y: hidden;
@@ -154,12 +159,12 @@
 
 .urlTokenResolved {
   color: var(--token-resolved);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .urlTokenMissing {
   color: var(--token-missing);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .urlInput::placeholder {
@@ -181,25 +186,26 @@
 .sendButtonCaret {
   min-height: 2.2rem;
   border: 1px solid var(--accent-primary);
-  background: var(--accent-primary);
+  background: linear-gradient(160deg, color-mix(in oklab, var(--accent-primary) 92%, #ffffff), var(--accent-primary));
   color: var(--accent-text);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .sendButton {
-  border-radius: 0.45rem 0 0 0.45rem;
+  border-radius: 0.72rem 0 0 0.72rem;
   border-right: 0;
-  min-width: 5rem;
+  min-width: 5.2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.8rem;
+  padding: 0.25rem 0.85rem;
 }
 
 .sendButtonCaret {
-  border-radius: 0 0.45rem 0.45rem 0;
-  width: 2rem;
+  border-radius: 0 0.72rem 0.72rem 0;
+  width: 2.1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -216,25 +222,25 @@
 .saveButtonCaret {
   min-height: 2.2rem;
   border: 1px solid var(--border);
-  background: var(--surface-soft);
+  background: var(--surface);
   color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .saveButton {
-  border-radius: 0.45rem 0 0 0.45rem;
+  border-radius: 0.72rem 0 0 0.72rem;
   border-right: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.25rem 0.82rem;
+  padding: 0.25rem 0.86rem;
 }
 
 .saveButtonCaret {
-  border-radius: 0 0.45rem 0.45rem 0;
-  width: 2rem;
+  border-radius: 0 0.72rem 0.72rem 0;
+  width: 2.1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -243,13 +249,14 @@
 
 .sendButton:hover,
 .sendButtonCaret:hover {
-  background: var(--accent-primary-hover);
+  background: linear-gradient(160deg, var(--accent-primary), var(--accent-primary-hover));
   border-color: var(--accent-primary-hover);
 }
 
 .saveButton:hover,
 .saveButtonCaret:hover {
-  background: var(--bg-tertiary);
+  background: var(--surface-soft);
+  color: var(--text-primary);
 }
 
 .saveIcon {
@@ -262,89 +269,151 @@
 
 .loading {
   grid-column: 1 / -1;
-  min-height: 1rem;
+  min-height: 1.1rem;
   color: var(--text-muted);
-  font-size: 0.75rem;
-  padding-left: 0.125rem;
+  font-size: 0.72rem;
+  padding-left: 0.15rem;
 }
 
 .tabs {
+  position: sticky;
+  top: 3.62rem;
+  z-index: 6;
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-width: 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in oklab, var(--bg-secondary) 88%, transparent);
+  backdrop-filter: blur(6px);
+  padding-inline: 0.62rem;
 }
 
 .tabsPrimary {
   display: flex;
   min-width: 0;
   overflow-x: auto;
+  gap: 0.22rem;
+  padding-block: 0.45rem;
 }
 
 .tabsSecondary {
   display: flex;
   align-items: center;
-  padding-inline: 0.65rem;
+  padding-inline: 0.2rem;
 }
 
 .tab,
 .tabActive,
 .variablesTab {
-  border: 0;
-  border-bottom: 2px solid transparent;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  min-height: 2.35rem;
-  padding: 0.48rem 0.78rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-height: 1.84rem;
+  padding: 0.3rem 0.7rem;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
 }
 
-.tabActive {
-  border-bottom-color: var(--focus-ring);
+.tab:hover,
+.variablesTab:hover {
+  border-color: var(--border-soft);
+  background: var(--surface-soft);
   color: var(--text-primary);
+}
+
+.tabActive {
+  border-color: var(--active-border);
+  background: var(--active-surface);
+  color: var(--active-text);
 }
 
 .variablesTab {
   color: var(--text-secondary);
-  padding-right: 0.9rem;
+  padding-right: 0.92rem;
 }
 
 .tabBadge {
   border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  padding: 0.125rem 0.42rem;
-  font-size: 0.68rem;
+  border-radius: 999px;
+  padding: 0.08rem 0.34rem;
+  font-size: 0.62rem;
   line-height: 1;
 }
 
 .panel {
   min-height: 0;
   overflow: auto;
+  background: color-mix(in oklab, var(--surface) 97%, transparent);
+}
+
+.settingsPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.settingsBody {
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.7rem;
+  max-width: 32rem;
+}
+
+.settingsField {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.settingsField span {
+  color: var(--text-primary);
+}
+
+.settingsHelp {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.settingsWarning {
+  margin: 0;
+  border: 1px solid color-mix(in oklab, var(--method-delete) 35%, transparent);
+  border-radius: 0.62rem;
+  background: color-mix(in oklab, var(--method-delete) 12%, transparent);
+  color: var(--method-delete);
+  padding: 0.45rem 0.52rem;
+  font-size: 0.69rem;
 }
 
 .sectionHeader {
-  min-height: 2.65rem;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-height: 2.7rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.3rem 1rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  padding: 0.35rem 0.88rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-soft);
 }
 
 .sectionTitle {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.86rem;
-  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .sectionActions {
@@ -353,21 +422,52 @@
   gap: 0.4rem;
 }
 
-.iconButton {
-  width: 1.85rem;
-  height: 1.85rem;
+.modeSwitch {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.52rem;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.modeSwitchButton,
+.modeSwitchButtonActive {
   border: 0;
+  border-right: 1px solid var(--border-soft);
   background: transparent;
   color: var(--text-secondary);
-  border-radius: 0.45rem;
+  font-size: 0.67rem;
+  font-weight: 700;
+  min-height: 1.7rem;
+  padding: 0.22rem 0.46rem;
+}
+
+.modeSwitch button:last-child {
+  border-right: 0;
+}
+
+.modeSwitchButtonActive {
+  color: var(--active-text);
+  background: var(--active-surface);
+}
+
+.iconButton {
+  width: 1.92rem;
+  height: 1.92rem;
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 0.6rem;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   display: grid;
   place-items: center;
 }
 
 .iconButton:hover {
   background: var(--surface-soft);
+  border-color: var(--border);
   color: var(--text-primary);
 }
 
@@ -378,6 +478,36 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+.bulkEditWrap {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.bulkEditHint {
+  margin: 0;
+  padding: 0.5rem 0.66rem;
+  color: var(--text-muted);
+  font-size: 0.67rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+}
+
+.bulkEditTextarea {
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 0.64rem 0.72rem;
+  resize: none;
+  font-family: var(--font-code);
+  font-size: 0.74rem;
+  line-height: 1.42;
 }
 
 .kvTable {
@@ -399,15 +529,17 @@
 }
 
 .kvTable th {
-  color: var(--text-dimmed);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 0.45rem 0.65rem;
-  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.69rem;
+  font-weight: 700;
+  padding: 0.48rem 0.66rem;
+  background: var(--surface-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .kvTable td {
-  background: var(--bg-primary);
+  background: var(--surface);
 }
 
 .kvTable input {
@@ -415,9 +547,13 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  padding: 0.45rem 0.65rem;
-  min-height: 2.35rem;
-  font-size: 0.8125rem;
+  padding: 0.52rem 0.66rem;
+  min-height: 2.4rem;
+  font-size: 0.75rem;
+}
+
+.kvTable input:focus {
+  background: color-mix(in oklab, var(--active-surface) 36%, var(--surface));
 }
 
 .gripHeader,
@@ -434,7 +570,7 @@
   background: transparent;
   color: var(--text-dimmed);
   width: 100%;
-  min-height: 2.35rem;
+  min-height: 2.4rem;
   cursor: move;
 }
 
@@ -447,19 +583,19 @@
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
-  min-height: 2.35rem;
+  min-height: 2.4rem;
 }
 
 .actionOk,
 .actionDelete {
-  border: 0;
+  border: 1px solid transparent;
   background: transparent;
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 0.3rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 0.4rem;
   display: grid;
   place-items: center;
-  font-size: 0.75rem;
+  font-size: 0.76rem;
 }
 
 .actionOk {
@@ -472,6 +608,7 @@
 
 .actionOk:hover,
 .actionDelete:hover {
+  border-color: var(--border-soft);
   background: var(--surface-soft);
 }
 
@@ -483,20 +620,20 @@
 
 .inlineSelect {
   min-height: 2rem;
-  padding: 0.25rem 0.55rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  padding: 0.25rem 0.58rem;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .overrideButton {
   border: 1px solid var(--border);
-  background: var(--surface-soft);
+  background: var(--surface);
   color: var(--text-secondary);
-  border-radius: 0.5rem;
-  min-height: 1.95rem;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  border-radius: 0.66rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 700;
 }
 
 .overrideButton:disabled {
@@ -517,42 +654,43 @@
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 0.7rem;
+  gap: 0.75rem;
   color: var(--text-muted);
 }
 
 .bodyEmptyIcon {
   width: 4rem;
   height: 4rem;
-  border: 2px solid var(--border);
+  border: 1px dashed var(--border-hover);
   border-radius: 1rem;
   display: grid;
   place-items: center;
   color: var(--text-dimmed);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  background: var(--surface-soft);
 }
 
 .bodyEmpty p {
   margin: 0;
-  font-size: 0.86rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .docButton {
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-secondary);
-  border-radius: 0.55rem;
-  min-height: 2.25rem;
-  min-width: 14rem;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.86rem;
+  border-radius: 0.65rem;
+  min-height: 2.1rem;
+  min-width: 11rem;
+  padding: 0.38rem 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
 .editorWrap {
   display: grid;
-  grid-template-columns: 3.25rem minmax(0, 1fr);
+  grid-template-columns: 3.4rem minmax(0, 1fr);
   flex: 1;
   min-height: 0;
 }
@@ -570,12 +708,12 @@
 .lineNumbers {
   margin: 0;
   border-right: 1px solid var(--border-soft);
-  padding: 0.55rem 0.35rem;
+  padding: 0.58rem 0.35rem;
   color: var(--line-number-color);
   background: var(--surface-soft);
   font-family: var(--font-code);
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   line-height: 1.45;
   user-select: none;
 }
@@ -587,9 +725,9 @@
   border: 0;
   background: var(--surface);
   color: var(--text-primary);
-  padding: 0.6rem 0.7rem;
+  padding: 0.62rem 0.72rem;
   font-family: var(--font-code);
-  font-size: 0.8125rem;
+  font-size: 0.76rem;
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
@@ -615,9 +753,9 @@
   border-radius: 0;
   background: var(--surface);
   color: var(--text-primary);
-  padding: 0.6rem 0.7rem;
+  padding: 0.62rem 0.72rem;
   font-family: var(--font-code);
-  font-size: 0.8125rem;
+  font-size: 0.76rem;
   line-height: 1.45;
   resize: none;
   min-height: 100%;
@@ -643,13 +781,13 @@
 .error {
   margin: 0.5rem 0.75rem;
   color: var(--method-delete);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
 }
 
 .scriptSplit {
   height: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 33%);
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 34%);
   min-height: 0;
 }
 
@@ -663,34 +801,34 @@
 .scriptAside {
   min-height: 0;
   overflow: auto;
-  padding: 1rem 1.25rem;
-  background: var(--surface);
+  padding: 0.92rem 1rem;
+  background: color-mix(in oklab, var(--surface-soft) 78%, transparent);
 }
 
 .scriptHelp {
-  margin: 0 0 0.85rem;
-  color: var(--text-muted);
-  font-size: 0.82rem;
+  margin: 0 0 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
   line-height: 1.45;
 }
 
 .docLink {
   color: var(--link-color);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   text-decoration: none;
 }
 
 .snippetTitle {
-  margin: 1.25rem 0 0.85rem;
+  margin: 1.15rem 0 0.75rem;
   color: var(--text-muted);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
 }
 
 .snippetList {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.28rem;
 }
 
 .snippetButton {
@@ -698,8 +836,8 @@
   background: transparent;
   color: var(--accent-link-color);
   text-align: left;
-  padding: 0.2rem 0;
-  font-size: 0.82rem;
+  padding: 0.22rem 0;
+  font-size: 0.74rem;
   font-weight: 700;
 }
 
@@ -733,14 +871,14 @@
 }
 
 .authMain {
-  padding: 1.2rem 1rem;
+  padding: 1rem 0.95rem;
   border-right: 1px solid var(--border-soft);
 }
 
 .authHint {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
@@ -754,31 +892,32 @@
   display: grid;
   gap: 0.35rem;
   color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.8125rem;
+  font-weight: 700;
+  font-size: 0.76rem;
 }
 
 .authField input,
 .authField select {
-  min-height: 2rem;
+  min-height: 2.05rem;
   padding: 0.35rem 0.55rem;
-  font-size: 0.8125rem;
+  font-size: 0.78rem;
 }
 
 .authAside {
-  padding: 1.2rem 1.5rem;
+  padding: 1.05rem 1.2rem;
   color: var(--text-muted);
+  background: color-mix(in oklab, var(--surface-soft) 78%, transparent);
 }
 
 .authAside p {
   margin: 0 0 0.7rem;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   line-height: 1.45;
 }
 
 .authAside a {
   color: var(--accent-link-color);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   text-decoration: none;
 }
@@ -797,10 +936,6 @@
 
   .tabs {
     align-items: stretch;
-  }
-
-  .tabsSecondary {
-    padding-right: 0.35rem;
   }
 }
 
@@ -821,6 +956,17 @@
 
   .sendButtonCaret,
   .saveButtonCaret {
-    width: 2.25rem;
+    width: 2.3rem;
+  }
+
+  .tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.2rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .tabsSecondary {
+    justify-content: flex-end;
   }
 }
