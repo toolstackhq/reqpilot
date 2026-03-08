@@ -1,48 +1,134 @@
 # Request Testing
 
-## Script Runtime
+ReqPilot supports JavaScript-based **pre-request** and **post-request** scripts using the `rp` runtime object.
 
-ReqPilot supports post-request JavaScript tests using the `rp` runtime object.
+## Runtime Quick Reference
 
-<DocTabs
-  :tabs="[
-    { id: 'basic', label: 'Basic Assertions' },
-    { id: 'array', label: 'Array Checks' },
-    { id: 'snippets', label: 'Snippet Ideas' }
-  ]"
->
-  <template v-slot:basic>
-    <pre><code>rp.test('status is 200', () =&gt; {
+- `rp.env.get(key)` / `rp.env.set(key, value)`
+- `rp.request.url` / `rp.request.body`
+- `rp.request.headers.set(key, value)`
+- `rp.response.status`
+- `rp.response.time`
+- `rp.response.json()` / `rp.response.text()`
+- `rp.response.headers.get(key)`
+- `rp.test(name, fn)`
+- `rp.expect(value)` with assertions:
+  - `toBe`
+  - `toBeGreaterThan`
+  - `toBeGreaterThanOrEqual`
+  - `toBeLessThan`
+  - `toBeLessThanOrEqual`
+  - `toHaveProperty`
+  - `toContain`
+  - `toBeTruthy`
+  - `toBeFalsy`
+
+## Basic Examples
+
+```js
+rp.test("status is 200", () => {
   rp.expect(rp.response.status).toBe(200);
-});</code></pre>
-    <pre><code>rp.test('status is 2xx', () =&gt; {
-  rp.expect(rp.response.status).toBeGreaterThan(199);
+});
+```
+
+```js
+rp.test("status is 2xx", () => {
+  rp.expect(rp.response.status).toBeGreaterThanOrEqual(200);
   rp.expect(rp.response.status).toBeLessThan(300);
-});</code></pre>
+});
+```
 
-  </template>
+## Advanced Generator Examples
 
-  <template v-slot:array>
-    <pre><code>rp.test('every item has email', () =&gt; {
+### Generate UUID and Reuse in Headers
+
+```js
+const uuid = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+rp.env.set("uuid", uuid);
+rp.request.headers.set("X-Correlation-ID", uuid);
+```
+
+### Generate Random Email
+
+```js
+const seed = Math.random().toString(36).slice(2, 10);
+rp.env.set("random_email", `user_${seed}@example.com`);
+```
+
+### Generate Random String / Password
+
+```js
+const randomString = (length = 16) => {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+};
+
+rp.env.set("random_string", randomString(16));
+```
+
+### Build Random JSON Request Body
+
+```js
+const suffix = Math.random().toString(36).slice(2, 8);
+const payload = {
+  name: `user_${suffix}`,
+  email: `user_${suffix}@example.com`
+};
+
+rp.request.body = JSON.stringify(payload, null, 2);
+```
+
+## Advanced Test Examples
+
+### Assert Array Response Has Email for Every Row
+
+```js
+rp.test("every item has email", () => {
   const body = rp.response.json();
   rp.expect(Array.isArray(body)).toBe(true);
-  rp.expect(body.every((item) =&gt; typeof item.email === 'string' &amp;&amp; item.email.length &gt; 0)).toBe(true);
-});</code></pre>
-    <pre><code>rp.test('at least one matching email', () =&gt; {
-  const body = rp.response.json();
-  rp.expect(body.some((item) =&gt; item.email === 'ava@example.com')).toBe(true);
-});</code></pre>
+  rp.expect(body.every((item) => typeof item.email === "string" && item.email.length > 0)).toBe(true);
+});
+```
 
-  </template>
+### Assert Response Header Exists
 
-  <template v-slot:snippets>
-    <ul>
-      <li>Status code checks (200, 2xx, etc.).</li>
-      <li>Response time checks.</li>
-      <li>Body property checks.</li>
-      <li>Auth flow checks across chained requests.</li>
-    </ul>
-    <p>Results are rendered in the <strong>Test Results</strong> tab for each response.</p>
+```js
+rp.test("content-type header exists", () => {
+  const contentType = rp.response.headers.get("content-type");
+  rp.expect(Boolean(contentType)).toBe(true);
+});
+```
 
-  </template>
-</DocTabs>
+### Save Token from Login Response
+
+```js
+const body = rp.response.json();
+if (body?.token) rp.env.set("token", body.token);
+
+rp.test("token present", () => {
+  rp.expect(Boolean(body?.token)).toBe(true);
+});
+```
+
+## Built-in Snippet Catalog (UI)
+
+### Pre-request Snippets
+
+- Environment: Set an environment variable
+- Environment: Set timestamp variable
+- Environment: Set random number variable
+- Utility: Generate UUID variable
+- Utility: Generate random email variable
+- Utility: Generate random string variable
+- Request: Inject correlation ID header
+- Request: Build random user JSON body
+
+### Post-request Snippets
+
+- Status code is 200
+- Status code is 2xx
+- Response time < 500ms
+- Body contains property
+- Body array: every item has email
+- Response header exists
+- Environment: Save token from response

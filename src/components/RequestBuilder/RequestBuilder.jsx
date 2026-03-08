@@ -13,10 +13,26 @@ const SNIPPETS = {
   'Environment: Set an environment variable': "rp.env.set('key', 'value');",
   'Environment: Set timestamp variable': "rp.env.set('timestamp', Date.now());",
   'Environment: Set random number variable': "rp.env.set('random', Math.floor(Math.random() * 1000));",
+  'Utility: Generate UUID variable':
+    "const uuid = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;\nrp.env.set('uuid', uuid);",
+  'Utility: Generate random email variable':
+    "const seed = Math.random().toString(36).slice(2, 10);\nrp.env.set('random_email', `user_${seed}@example.com`);",
+  'Utility: Generate random string variable':
+    "const randomString = (length = 12) => {\n  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';\n  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');\n};\nrp.env.set('random_string', randomString(12));",
+  'Request: Inject correlation ID header':
+    "const correlationId = rp.env.get('uuid') || globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;\nrp.request.headers.set('X-Correlation-ID', correlationId);\nrp.env.set('uuid', correlationId);",
+  'Request: Build random user JSON body':
+    "const suffix = Math.random().toString(36).slice(2, 8);\nconst payload = {\n  name: `user_${suffix}`,\n  email: `user_${suffix}@example.com`\n};\nrp.request.body = JSON.stringify(payload, null, 2);",
   'Status code is 200': 'rp.test("status is 200", () => {\n  rp.expect(rp.response.status).toBe(200);\n});',
   'Status code is 2xx': 'rp.test("status is 2xx", () => {\n  rp.expect(rp.response.status).toBeGreaterThanOrEqual(200);\n  rp.expect(rp.response.status).toBeLessThan(300);\n});',
   'Response time < 500ms': 'rp.test("response time < 500ms", () => {\n  rp.expect(rp.response.time).toBeLessThan(500);\n});',
   'Body contains property': 'rp.test("body has property", () => {\n  const body = rp.response.json();\n  rp.expect(body).toHaveProperty("id");\n});',
+  'Body array: every item has email':
+    'rp.test("every item has email", () => {\n  const body = rp.response.json();\n  rp.expect(Array.isArray(body)).toBe(true);\n  rp.expect(body.every((item) => typeof item.email === "string" && item.email.length > 0)).toBe(true);\n});',
+  'Response header exists':
+    'rp.test("content-type header exists", () => {\n  const contentType = rp.response.headers.get("content-type");\n  rp.expect(Boolean(contentType)).toBe(true);\n});',
+  'Environment: Save token from response':
+    'const body = rp.response.json();\nif (body?.token) {\n  rp.env.set("token", body.token);\n}\nrp.test("token present in response", () => {\n  rp.expect(Boolean(body?.token)).toBe(true);\n});',
 };
 
 function methodKey(method) {
@@ -279,9 +295,22 @@ export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSen
     'Environment: Set an environment variable',
     'Environment: Set timestamp variable',
     'Environment: Set random number variable',
+    'Utility: Generate UUID variable',
+    'Utility: Generate random email variable',
+    'Utility: Generate random string variable',
+    'Request: Inject correlation ID header',
+    'Request: Build random user JSON body',
   ];
 
-  const postScriptSnippets = ['Status code is 200', 'Status code is 2xx', 'Response time < 500ms', 'Body contains property'];
+  const postScriptSnippets = [
+    'Status code is 200',
+    'Status code is 2xx',
+    'Response time < 500ms',
+    'Body contains property',
+    'Body array: every item has email',
+    'Response header exists',
+    'Environment: Save token from response',
+  ];
 
   return (
     <div className={styles.root}>
