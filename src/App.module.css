@@ -2,25 +2,30 @@
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: var(--bg-primary);
+  background: transparent;
   color: var(--text-primary);
 }
 
 .topBar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
+  padding: 0.78rem 1.05rem;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  padding: 0.35rem 0.75rem;
+  backdrop-filter: blur(12px);
+  background: color-mix(in oklab, var(--bg-secondary) 86%, transparent);
 }
 
 .brand {
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--text-primary);
+  font-size: 0.93rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--accent-primary);
+  text-transform: uppercase;
 }
 
 .workspaceSelect,
@@ -30,15 +35,16 @@
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-secondary);
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  min-height: 2rem;
-  padding: 0.3rem 0.55rem;
+  border-radius: 0.65rem;
+  font-size: 0.78rem;
+  min-height: 2.1rem;
+  padding: 0.35rem 0.62rem;
 }
 
 .workspaceSelect {
   color: var(--text-primary);
-  border-bottom: 2px solid var(--focus-ring);
+  border-color: var(--active-border);
+  background: var(--active-surface);
 }
 
 .navButton {
@@ -46,13 +52,11 @@
 }
 
 .navButtonGhost {
-  color: var(--text-secondary);
-  background: var(--surface);
-  border-color: var(--border-soft);
+  border-style: dashed;
 }
 
 .navIcon {
-  width: 2rem;
+  width: 2.2rem;
   text-align: center;
   padding-inline: 0;
 }
@@ -61,65 +65,69 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 0.375rem;
-  width: clamp(12rem, 24vw, 16rem);
   justify-self: center;
-  min-height: 2rem;
+  width: clamp(13rem, 24vw, 18.5rem);
+  min-height: 2.22rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%);
 }
 
 .commandInput {
   border: 0;
   background: transparent;
   color: var(--text-primary);
-  padding: 0.32rem 0.55rem;
+  padding: 0.3rem 0.75rem;
   min-width: 0;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
+}
+
+.commandInput::placeholder {
+  color: var(--text-muted);
 }
 
 .commandHint {
-  margin-right: 0.35rem;
+  margin-right: 0.34rem;
   border: 1px solid var(--border-soft);
   background: var(--surface-soft);
   color: var(--text-muted);
-  border-radius: 0.3125rem;
-  font-size: 0.625rem;
-  padding: 0.0625rem 0.3125rem;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 0.08rem 0.42rem;
 }
 
 .main {
   min-height: 0;
   display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem minmax(20rem, 28rem);
-  background: var(--surface-soft);
+  grid-template-columns: 3rem minmax(0, 1fr) 3rem minmax(20rem, 27rem);
+  gap: 0.72rem;
+  padding: 0.72rem;
 }
 
 .leftRail,
 .rightRail {
-  border-right: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--surface) 96%, var(--bg-tertiary));
+  box-shadow: var(--shadow-elevated);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.25rem;
-}
-
-.rightRail {
-  border-left: 1px solid var(--border);
-  border-right: 0;
+  gap: 0.42rem;
+  padding: 0.42rem 0.26rem;
 }
 
 .railButton {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.35rem;
+  height: 2.35rem;
   border: 1px solid var(--border-soft);
   background: transparent;
   color: var(--text-secondary);
-  border-radius: 0.5rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+  border-radius: 0.72rem;
+  font-size: 1.02rem;
+  font-weight: 700;
   line-height: 1;
   display: grid;
   place-items: center;
@@ -129,16 +137,17 @@
   background: var(--surface-soft);
   border-color: var(--border-hover);
   color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 .railButtonActive {
-  background: var(--surface);
-  border-color: var(--focus-ring);
-  color: var(--focus-ring);
+  background: var(--active-surface);
+  border-color: var(--active-border);
+  color: var(--active-text);
 }
 
 .railButtonFuture {
-  opacity: 0.72;
+  opacity: 0.8;
   cursor: pointer;
 }
 
@@ -151,16 +160,21 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--surface) 98%, var(--bg-tertiary));
+  box-shadow: var(--shadow-elevated);
 }
 
 .requestTabsBar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
   display: flex;
   align-items: stretch;
   min-width: 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface-soft) 70%, transparent), transparent);
 }
 
 .requestTabsList {
@@ -168,32 +182,27 @@
   align-items: stretch;
   min-width: 0;
   overflow-x: auto;
+  padding: 0.32rem 0.38rem;
+  gap: 0.3rem;
 }
 
 .requestTabItem {
   display: inline-flex;
-  align-items: stretch;
-  border-right: 1px solid var(--border);
+  align-items: center;
+  gap: 0.12rem;
 }
 
 .requestTab,
 .requestTabActive,
 .requestTabAdd,
 .requestTabClose {
-  border: 0;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--text-primary);
-  padding: 0.38rem 0.62rem;
-  font-size: 0.6875rem;
+  border-radius: 0.66rem;
+  padding: 0.34rem 0.56rem;
+  font-size: 0.7rem;
   white-space: nowrap;
-}
-
-.requestMethod {
-  color: var(--method-get);
-  font-weight: 600;
-  margin-right: 0.3rem;
-  font-family: var(--font-code);
-  font-size: 0.6875rem;
 }
 
 .requestTab,
@@ -207,9 +216,23 @@
   color: var(--text-secondary);
 }
 
+.requestTab:hover {
+  border-color: var(--border-soft);
+  background: var(--surface-soft);
+}
+
 .requestTabActive {
-  box-shadow: inset 0 -2px 0 0 var(--focus-ring);
-  color: var(--text-primary);
+  border-color: var(--active-border);
+  background: var(--active-surface);
+  color: var(--active-text);
+}
+
+.requestMethod {
+  color: var(--method-get);
+  font-weight: 700;
+  margin-right: 0.26rem;
+  font-family: var(--font-code);
+  font-size: 0.66rem;
 }
 
 .requestTabTitle {
@@ -220,21 +243,26 @@
 
 .requestTabClose {
   color: var(--text-muted);
-  padding-inline: 0.38rem;
+  width: 1.65rem;
+  height: 1.65rem;
   display: grid;
   place-items: center;
+  padding: 0;
 }
 
 .requestTabClose:hover {
   background: var(--surface-soft);
   color: var(--text-primary);
+  border-color: var(--border-soft);
 }
 
 .requestTabAdd {
-  width: 2.25rem;
-  color: var(--text-secondary);
+  width: 1.95rem;
+  height: 1.95rem;
   display: grid;
   place-items: center;
+  color: var(--text-secondary);
+  border-color: var(--border-soft);
 }
 
 .requestTabAdd:hover {
@@ -244,22 +272,22 @@
 
 .requestPane {
   min-height: 0;
-  background: var(--bg-primary);
+  background: transparent;
   flex: 1;
   overflow: hidden;
 }
 
 .responsePane {
   min-height: 11rem;
-  background: var(--bg-primary);
+  background: transparent;
   overflow: hidden;
 }
 
 .horizontalSplitter {
-  height: 0.65rem;
-  border-top: 1px solid var(--border);
+  height: 0.9rem;
+  border-top: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
-  background: var(--surface-soft);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface-soft) 68%, transparent), transparent);
   cursor: row-resize;
   display: grid;
   place-items: center;
@@ -267,46 +295,65 @@
 }
 
 .splitterGrip {
-  width: 3rem;
-  height: 0.2rem;
+  width: 3.3rem;
+  height: 0.22rem;
   border-radius: 999px;
   background: var(--border-hover);
 }
 
 .collectionsPane {
   min-height: 0;
-  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--surface) 98%, var(--bg-tertiary));
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
 }
 
 .statusBar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.52rem;
   border-top: 1px solid var(--border);
-  background: var(--surface);
+  background: color-mix(in oklab, var(--bg-secondary) 88%, transparent);
   color: var(--text-muted);
-  font-size: 0.6875rem;
-  padding: 0.3rem 0.5rem;
+  font-size: 0.67rem;
+  padding: 0.38rem 0.62rem;
+}
+
+.statusBar > span {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+  background: color-mix(in oklab, var(--surface-soft) 88%, transparent);
 }
 
 .envStatus {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.28rem;
+}
+
+.connectionStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
 }
 
 .envName {
-  color: var(--focus-ring);
-  font-weight: 700;
+  color: var(--accent-primary);
+  font-weight: 800;
 }
 
 .envChangeButton {
   border: 1px solid var(--border-soft);
   background: transparent;
   color: var(--text-secondary);
-  border-radius: 0.3rem;
-  font-size: 0.625rem;
-  padding: 0.02rem 0.32rem;
+  border-radius: 999px;
+  font-size: 0.63rem;
+  font-weight: 700;
+  padding: 0.04rem 0.38rem;
 }
 
 .envChangeButton:hover {
@@ -326,10 +373,10 @@
 .envVarMore {
   border: 1px solid transparent;
   border-radius: 999px;
-  padding: 0.04rem 0.38rem;
+  padding: 0.06rem 0.38rem;
   font-family: var(--font-code);
-  font-size: 0.625rem;
-  line-height: 1.2;
+  font-size: 0.63rem;
+  line-height: 1.22;
 }
 
 .envVarResolved {
@@ -352,6 +399,9 @@
 
 .statusSpacer {
   margin-left: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
 }
 
 .overlay {
@@ -363,22 +413,21 @@
 
 .drawer {
   position: fixed;
-  top: 0;
-  right: 0;
-  width: min(28rem, 100vw);
-  height: 100vh;
-  border-left: 1px solid var(--border);
-  background: var(--bg-primary);
-  z-index: 8;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: min(30rem, calc(100vw - 1.1rem));
+  height: calc(100vh - 1.1rem);
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-elevated);
+  z-index: 12;
+  overflow: hidden;
 }
 
 @media (max-width: 1300px) {
-  .topBar {
-    grid-template-columns: auto 1fr;
-  }
-
   .main {
-    grid-template-columns: 2.5rem minmax(0, 1fr) minmax(18rem, 24rem);
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(18rem, 24rem);
   }
 
   .rightRail {
@@ -386,7 +435,15 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
+  .topBar {
+    padding-inline: 0.7rem;
+  }
+
+  .commandSearch {
+    width: clamp(12rem, 52vw, 18rem);
+  }
+
   .commandHint {
     display: none;
   }
@@ -395,15 +452,12 @@
 @media (max-width: 980px) {
   .main {
     grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(20rem, auto) minmax(20rem, auto);
+    grid-template-rows: auto minmax(22rem, auto) minmax(20rem, auto);
+    padding: 0.62rem;
   }
 
   .leftRail {
     display: none;
-  }
-
-  .centerArea {
-    border-right: 0;
   }
 
   .collectionsPane {

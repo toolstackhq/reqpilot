@@ -10,10 +10,12 @@ import { ImportModal } from './components/Import/ImportModal.jsx';
 import { SaveRequestModal } from './components/SaveRequest/SaveRequestModal.jsx';
 import { ComingSoonModal } from './components/ComingSoon/ComingSoonModal.jsx';
 import { CommandPalette } from './components/CommandPalette/CommandPalette.jsx';
+import { SecurityModal } from './components/Security/SecurityModal.jsx';
 import { useTheme } from './hooks/useTheme.js';
 import { useHistory } from './hooks/useHistory.js';
 import { useCollections } from './hooks/useCollections.js';
 import { useEnvironments } from './hooks/useEnvironments.js';
+import { useSecuritySettings } from './hooks/useSecuritySettings.js';
 import { useRequestSender } from './hooks/useRequestSender.js';
 
 function makeRow() {
@@ -52,6 +54,9 @@ function createDefaultRequest() {
       preRequest: '',
       tests: '',
       postRequest: '',
+    },
+    security: {
+      sslVerification: 'inherit',
     },
   };
 }
@@ -98,9 +103,10 @@ export default function App() {
   const [showSaveRequest, setShowSaveRequest] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showEnvManager, setShowEnvManager] = useState(false);
+  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [comingSoonFeature, setComingSoonFeature] = useState(null);
-  const [proxyStatus, setProxyStatus] = useState('checking');
+  const [connectionStatus, setConnectionStatus] = useState('checking');
 
   const { theme, toggleTheme } = useTheme();
   const { history, addHistory, clearHistory } = useHistory();
@@ -116,10 +122,19 @@ export default function App() {
     updateActiveVariables,
     importEnvironment,
   } = useEnvironments();
+  const {
+    settings: securitySettings,
+    setVerifySslByDefault,
+    addHostRule,
+    updateHostRule,
+    removeHostRule,
+    resolveRequestSecurity,
+  } = useSecuritySettings();
 
   const { sendRequest, isSending, elapsedMs } = useRequestSender({
     variables: activeVariablesMap,
     updateVariable: upsertVariable,
+    resolveSecurity: resolveRequestSecurity,
   });
 
   const mainRef = useRef(null);
@@ -221,9 +236,9 @@ export default function App() {
     const interval = window.setInterval(async () => {
       try {
         const result = await fetch('/health');
-        setProxyStatus(result.ok ? 'online' : 'offline');
+        setConnectionStatus(result.ok ? 'online' : 'offline');
       } catch {
-        setProxyStatus('offline');
+        setConnectionStatus('offline');
       }
     }, 3000);
 
@@ -241,6 +256,7 @@ export default function App() {
         setShowImport(false);
         setShowHistory(false);
         setShowEnvManager(false);
+        setShowSecuritySettings(false);
         setShowPalette(false);
         setComingSoonFeature(null);
       }
@@ -370,11 +386,11 @@ export default function App() {
           <input
             className={styles.commandInput}
             type="text"
-            placeholder="Search and commands"
-            aria-label="Search and commands"
+            placeholder="Open commands, requests, shortcuts"
+            aria-label="Open command palette"
             onFocus={() => setShowPalette(true)}
           />
-          <span className={styles.commandHint}>Ctrl K</span>
+          <span className={styles.commandHint}>Ctrl/⌘ K</span>
         </div>
       </header>
 
@@ -493,7 +509,7 @@ export default function App() {
             title="Collections"
             onClick={() => document.getElementById('collections-panel')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            ▦
+            C
           </button>
           <button
             className={styles.railButton}
@@ -502,7 +518,7 @@ export default function App() {
             title="Environments"
             onClick={() => setShowEnvManager(true)}
           >
-            ◎
+            E
           </button>
           <button
             className={styles.railButton}
@@ -511,7 +527,7 @@ export default function App() {
             title="History"
             onClick={() => setShowHistory(true)}
           >
-            ◷
+            H
           </button>
         </nav>
 
@@ -554,7 +570,12 @@ export default function App() {
             {templateVariables.length > 4 ? <span className={styles.envVarMore}>+{templateVariables.length - 4}</span> : null}
           </div>
         ) : null}
-        <span>Proxy: {proxyStatus}</span>
+        <span className={styles.connectionStatus}>
+          Connection: {connectionStatus === 'online' ? 'Ready' : connectionStatus === 'checking' ? 'Checking' : 'Error'}
+          <button type="button" className={styles.envChangeButton} onClick={() => setShowSecuritySettings(true)}>
+            SSL
+          </button>
+        </span>
         <span>Mode: REST</span>
         <span>Version: 1.0.0</span>
         <span>Status: {statusText}</span>
@@ -607,6 +628,17 @@ export default function App() {
         />
       ) : null}
 
+      {showSecuritySettings ? (
+        <SecurityModal
+          settings={securitySettings}
+          onClose={() => setShowSecuritySettings(false)}
+          onChangeDefaultVerification={setVerifySslByDefault}
+          onAddHostRule={addHostRule}
+          onUpdateHostRule={updateHostRule}
+          onRemoveHostRule={removeHostRule}
+        />
+      ) : null}
+
       {comingSoonFeature ? (
         <ComingSoonModal feature={comingSoonFeature} onClose={() => setComingSoonFeature(null)} />
       ) : null}
@@ -619,6 +651,7 @@ export default function App() {
             { id: 'save', label: 'Save Request', run: onOpenSaveRequest },
             { id: 'new-tab', label: 'New Request Tab', run: addNewRequestTab },
             { id: 'env', label: 'Manage Environments', run: () => setShowEnvManager(true) },
+            { id: 'security', label: 'SSL & Security Settings', run: () => setShowSecuritySettings(true) },
             {
               id: 'collections',
               label: 'Focus Collections',
