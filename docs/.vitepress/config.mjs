@@ -10,6 +10,8 @@ export default defineConfig({
     nav: [
       { text: 'Getting Started', link: '/getting-started' },
       { text: 'Features', link: '/features' },
+      { text: 'Import', link: '/importing-collections' },
+      { text: 'Environments', link: '/environments-and-variables' },
       { text: 'UI Preview', link: '/ui-preview' },
       { text: 'Security', link: '/security-and-ssl' },
       { text: 'GitHub', link: 'https://github.com/toolstackhq/reqpilot' },
@@ -21,6 +23,8 @@ export default defineConfig({
           { text: 'Introduction', link: '/' },
           { text: 'Getting Started', link: '/getting-started' },
           { text: 'Features', link: '/features' },
+          { text: 'Importing Collections', link: '/importing-collections' },
+          { text: 'Environments and Variables', link: '/environments-and-variables' },
           { text: 'UI Preview', link: '/ui-preview' },
           { text: 'Request Testing', link: '/request-testing' },
           { text: 'Security and SSL', link: '/security-and-ssl' },
