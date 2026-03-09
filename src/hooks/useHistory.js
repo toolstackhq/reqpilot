@@ -1,28 +1,53 @@
 import { useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'reqpilot_history';
+const STORAGE_KEY = 'reqpilot_history_v2';
 const MAX_HISTORY = 50;
 
-function loadHistory() {
+function loadHistoryMap() {
   try {
-    return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]');
+    const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
   } catch {
-    return [];
+    // noop
   }
+
+  try {
+    const legacy = JSON.parse(window.localStorage.getItem('reqpilot_history') || '[]');
+    if (Array.isArray(legacy)) {
+      return { 'ws-personal': legacy };
+    }
+  } catch {
+    // noop
+  }
+
+  return {};
 }
 
-export function useHistory() {
-  const [history, setHistory] = useState(() => (typeof window === 'undefined' ? [] : loadHistory()));
+export function useHistory(workspaceId = 'ws-personal') {
+  const [historyMap, setHistoryMap] = useState(() => (typeof window === 'undefined' ? {} : loadHistoryMap()));
+  const history = historyMap[workspaceId] || [];
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-  }, [history]);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(historyMap));
+  }, [historyMap]);
+
+  function updateWorkspaceHistory(updater) {
+    setHistoryMap((prev) => {
+      const current = prev[workspaceId] || [];
+      return {
+        ...prev,
+        [workspaceId]: updater(current),
+      };
+    });
+  }
 
   const addHistory = (entry) => {
-    setHistory((prev) => [entry, ...prev].slice(0, MAX_HISTORY));
+    updateWorkspaceHistory((prev) => [entry, ...prev].slice(0, MAX_HISTORY));
   };
 
-  const clearHistory = () => setHistory([]);
+  const clearHistory = () => updateWorkspaceHistory(() => []);
 
   return { history, addHistory, clearHistory };
 }

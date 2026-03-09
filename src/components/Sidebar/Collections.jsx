@@ -10,6 +10,8 @@ export function Collections({
   onExport,
   onOpenImport,
   workspaceMode = false,
+  workspaceName = '',
+  onOpenWorkspace,
 }) {
   const [collapsedIds, setCollapsedIds] = useState(() => new Set(collections.map((collection) => collection.id)));
   const [query, setQuery] = useState('');
@@ -78,12 +80,18 @@ export function Collections({
   return (
     <div className={`${styles.panel} ${workspaceMode ? styles.workspacePanel : ''}`}>
       <header className={styles.header}>
-        <h2>Collections</h2>
+        <div>
+          <h2>Collections</h2>
+          {workspaceMode && workspaceName ? <p className={styles.workspaceHeading}>{workspaceName}</p> : null}
+        </div>
         <div className={styles.actions}>
           {workspaceMode ? (
             <>
               <button type="button" onClick={openCreateCollection}>
                 + New
+              </button>
+              <button type="button" onClick={onOpenWorkspace} aria-label="Open workspace manager">
+                Open
               </button>
               <button type="button" onClick={onOpenImport} aria-label="Import collection">
                 ⤓
