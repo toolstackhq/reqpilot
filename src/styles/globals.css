@@ -41,6 +41,13 @@
   --json-number-color: #b45309;
   --json-bool-color: #7c3aed;
   --json-null-color: #dc2626;
+  --js-keyword-color: #7c3aed;
+  --js-string-color: #0f7a56;
+  --js-number-color: #b45309;
+  --js-bool-color: #7c3aed;
+  --js-null-color: #dc2626;
+  --js-comment-color: #6b7280;
+  --js-builtin-color: #0369a1;
 
   --token-resolved: #15803d;
   --token-missing: #b91c1c;
@@ -116,6 +123,13 @@
   --json-number-color: #fcd34d;
   --json-bool-color: #c4b5fd;
   --json-null-color: #fca5a5;
+  --js-keyword-color: #c4b5fd;
+  --js-string-color: #86efac;
+  --js-number-color: #fcd34d;
+  --js-bool-color: #c4b5fd;
+  --js-null-color: #fca5a5;
+  --js-comment-color: #94a3b8;
+  --js-builtin-color: #7dd3fc;
 
   --token-resolved: #34d399;
   --token-missing: #f87171;
@@ -250,6 +264,35 @@ textarea::placeholder {
 
 .json-null {
   color: var(--json-null-color);
+}
+
+.js-keyword {
+  color: var(--js-keyword-color);
+}
+
+.js-string {
+  color: var(--js-string-color);
+}
+
+.js-number {
+  color: var(--js-number-color);
+}
+
+.js-bool {
+  color: var(--js-bool-color);
+}
+
+.js-null {
+  color: var(--js-null-color);
+}
+
+.js-comment {
+  color: var(--js-comment-color);
+  font-style: italic;
+}
+
+.js-builtin {
+  color: var(--js-builtin-color);
 }
 
 ::-webkit-scrollbar {

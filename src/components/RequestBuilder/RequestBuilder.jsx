@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './RequestBuilder.module.css';
 import { UrlBar } from './UrlBar.jsx';
 import { ParamsEditor } from './ParamsEditor.jsx';
@@ -6,6 +6,7 @@ import { HeadersEditor } from './HeadersEditor.jsx';
 import { BodyEditor } from './BodyEditor.jsx';
 import { AuthEditor } from './AuthEditor.jsx';
 import { parseParamsFromUrl, applyParamsToUrl } from '../../utils/urlSync.js';
+import { highlightJavaScript, formatJavaScript } from '../../utils/syntaxHighlight.js';
 
 const TABS = ['Parameters', 'Body', 'Headers', 'Authorization', 'Settings', 'Pre-request Script', 'Post-request Script'];
 
@@ -54,7 +55,24 @@ function isFilledRow(row = {}) {
 }
 
 function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel, snippetNames, onAppendSnippet }) {
-  const lineNumbers = Array.from({ length: Math.max(1, value.split('\n').length) }, (_, index) => index + 1).join('\n');
+  const scriptHighlightRef = useRef(null);
+  const lineNumbers = useMemo(
+    () => Array.from({ length: Math.max(1, value.split('\n').length) }, (_, index) => index + 1).join('\n'),
+    [value]
+  );
+  const highlightedScript = useMemo(() => highlightJavaScript(value || ''), [value]);
+
+  function syncScriptHighlightScroll(event) {
+    if (!scriptHighlightRef.current) return;
+    scriptHighlightRef.current.scrollTop = event.target.scrollTop;
+    scriptHighlightRef.current.scrollLeft = event.target.scrollLeft;
+  }
+
+  function formatScript() {
+    const formatted = formatJavaScript(value || '');
+    if (formatted === value) return;
+    onChange(formatted);
+  }
 
   return (
     <div className={styles.scriptSplit}>
@@ -62,6 +80,9 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
         <header className={styles.sectionHeader}>
           <h3 className={styles.sectionTitle}>JavaScript Code</h3>
           <div className={styles.sectionActions}>
+            <button className={styles.formatButton} type="button" aria-label={`Format ${title}`} onClick={formatScript}>
+              Format
+            </button>
             <button className={styles.iconButton} type="button" aria-label={`${title} help`}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
@@ -84,13 +105,29 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
           <pre className={styles.lineNumbers} aria-hidden="true">
             {lineNumbers}
           </pre>
-          <textarea
-            id={id}
-            className={styles.scriptTextarea}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={placeholder}
-          />
+          <div className={styles.codeInputWrap}>
+            {value?.length ? (
+              <pre
+                className={styles.scriptHighlight}
+                ref={scriptHighlightRef}
+                aria-hidden="true"
+                dangerouslySetInnerHTML={{ __html: highlightedScript }}
+              />
+            ) : (
+              <pre className={`${styles.scriptHighlight} ${styles.jsonPlaceholder}`} ref={scriptHighlightRef} aria-hidden="true">
+                {placeholder}
+              </pre>
+            )}
+            <textarea
+              id={id}
+              className={styles.scriptTextareaSyntax}
+              value={value}
+              onChange={(event) => onChange(event.target.value)}
+              placeholder={placeholder}
+              onScroll={syncScriptHighlightScroll}
+              spellCheck={false}
+            />
+          </div>
         </div>
       </section>
 

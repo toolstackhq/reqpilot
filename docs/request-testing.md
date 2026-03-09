@@ -23,6 +23,10 @@ ReqPilot supports JavaScript-based **pre-request** and **post-request** scripts 
   - `toBeTruthy`
   - `toBeFalsy`
 
+Script editor UX:
+- JavaScript syntax highlighting in pre/post script editors
+- `Format` button for quick script formatting
+
 ## Basic Examples
 
 ```js
