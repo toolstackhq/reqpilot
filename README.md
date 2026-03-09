@@ -12,6 +12,23 @@ Modern REST API client with a clean, fast workflow for request building, testing
 
 ![ReqPilot application screenshot](./docs/public/reqpilot.png)
 
+## Install and Run (npm)
+
+Browser-first CLI usage (cross-platform):
+
+```bash
+npx reqpilot
+```
+
+or install globally:
+
+```bash
+npm i -g reqpilot
+reqpilot
+```
+
+The app starts on `http://localhost:5489` and opens in your default browser.
+
 ## Optional Desktop Wrapper Scaffold
 
 Generate a separate Electron wrapper project (macOS/Linux/Windows packaging) without changing the core web app flow:
@@ -55,3 +72,40 @@ Or install `.deb` on Debian/Ubuntu:
 sudo apt install ./desktop-wrapper/dist/reqpilot_*_amd64.deb
 reqpilot
 ```
+
+## Release and npm Publish (GitHub Actions)
+
+`release-publish.yml` publishes to npm and creates GitHub release notes when you push a semver tag (`v*.*.*`).
+
+### 1. Add npm token in GitHub
+
+Repository settings:
+`Settings` -> `Secrets and variables` -> `Actions` -> `New repository secret`
+
+Secret name:
+
+```text
+NPM_TOKEN
+```
+
+Value:
+your npm automation token from npmjs.com.
+
+### 2. Cut a release
+
+1. Update `package.json` version.
+2. Commit and push to `main`.
+3. Create and push a matching tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The workflow will:
+
+1. install dependencies
+2. run tests + build
+3. validate tag matches `package.json`
+4. publish to npm
+5. create GitHub release notes automatically
