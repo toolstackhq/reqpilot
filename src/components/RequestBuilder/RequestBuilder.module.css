@@ -549,6 +549,11 @@
   place-items: center;
 }
 
+.iconButton:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
 .formatButton {
   border: 1px solid var(--border-soft);
   background: var(--surface);
@@ -708,13 +713,12 @@
   text-align: center;
 }
 
-.gripButton {
-  border: 0;
-  background: transparent;
+.rowMarker {
   color: var(--text-dimmed);
-  width: 100%;
-  min-height: 2.4rem;
-  cursor: move;
+  font-size: 0.82rem;
+  display: inline-block;
+  width: 1rem;
+  text-align: center;
 }
 
 .actionsHeader {

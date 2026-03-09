@@ -6,6 +6,7 @@ playwright-report/
 tmp/
 h*.png
 dist/
+desktop-wrapper/
 docs/.vitepress/dist/
 /public/
 reqpilot-final-prompt.md

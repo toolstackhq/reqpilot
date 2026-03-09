@@ -97,5 +97,7 @@ test('new tab button creates and switches to a fresh request tab', async ({ page
   await page.getByRole('button', { name: 'Add request tab' }).click();
 
   await expect(workspaceTabs.getByRole('tab', { selected: true })).toContainText('Untitled');
-  await expect(page.locator('#request-url-input')).toHaveValue('http://localhost:4444/api/users');
+  await expect(page.locator('#request-url-input')).toHaveValue(
+    'https://petstore.swagger.io/v2/pet/findByStatus?status=available'
+  );
 });

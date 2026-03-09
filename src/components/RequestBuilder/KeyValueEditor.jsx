@@ -25,26 +25,6 @@ function normalizeRow(row = {}) {
   };
 }
 
-function withDraftRow(rows = []) {
-  const safeRows = rows.length ? rows.map(normalizeRow) : [makeRow()];
-  let lastNonEmpty = -1;
-
-  for (let index = 0; index < safeRows.length; index += 1) {
-    if (!isEmptyRow(safeRows[index])) {
-      lastNonEmpty = index;
-    }
-  }
-
-  if (lastNonEmpty < 0) {
-    return [normalizeRow(safeRows[0])];
-  }
-
-  const base = safeRows.slice(0, lastNonEmpty + 1).map(normalizeRow);
-  const existingDraft = safeRows[lastNonEmpty + 1];
-  const draft = existingDraft && isEmptyRow(existingDraft) ? normalizeRow(existingDraft) : makeRow();
-  return [...base, draft];
-}
-
 function rowsToBulkText(rows = []) {
   return rows
     .filter((row) => !isEmptyRow(row) && row.enabled !== false && row.key)
@@ -84,19 +64,37 @@ function parseBulkText(text = '') {
   }).filter((row) => row.key);
 }
 
-export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, keySuggestions = [], valueSuggestions = [] }) {
+export function KeyValueEditor({
+  label,
+  mode = 'params',
+  rows = [],
+  onChange,
+  keySuggestions = [],
+  valueSuggestions = [],
+  suppressDraftRow = false,
+}) {
   const supportsBulkEdit = mode === 'params' || mode === 'headers';
   const [editorMode, setEditorMode] = useState('table');
   const [bulkText, setBulkText] = useState(() => rowsToBulkText(rows));
-  const effectiveRows = withDraftRow(rows);
+  const effectiveRows = rows.length ? rows.map(normalizeRow) : suppressDraftRow ? [] : [makeRow()];
 
   const showDescription = mode !== 'body';
-  const showActions = mode !== 'headers';
+  const showActions = true;
+  const showCommitAction = mode !== 'headers';
 
   useEffect(() => {
     if (editorMode === 'bulk') return;
     setBulkText(rowsToBulkText(rows));
   }, [rows, editorMode]);
+
+  function commitRows(nextRows) {
+    const normalized = nextRows.map(normalizeRow);
+    if (!normalized.length) {
+      onChange(suppressDraftRow ? [] : [makeRow()]);
+      return;
+    }
+    onChange(normalized);
+  }
 
   function updateRow(index, field, value) {
     const updated = effectiveRows.map((row, rowIndex) =>
@@ -108,16 +106,16 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
           }
         : row
     );
-    onChange(withDraftRow(updated));
+    commitRows(updated);
   }
 
   function removeRow(index) {
     const next = effectiveRows.filter((_, rowIndex) => rowIndex !== index);
-    onChange(withDraftRow(next));
+    commitRows(next);
   }
 
   function clearRows() {
-    onChange(withDraftRow([]));
+    commitRows([]);
     setBulkText('');
   }
 
@@ -131,7 +129,11 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
 
   function updateBulkText(value) {
     setBulkText(value);
-    onChange(withDraftRow(parseBulkText(value)));
+    commitRows(parseBulkText(value));
+  }
+
+  function addRow() {
+    commitRows([...effectiveRows, makeRow()]);
   }
 
   return (
@@ -159,6 +161,18 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
               </button>
             </div>
           ) : null}
+          <button
+            className={styles.iconButton}
+            type="button"
+            aria-label={`Add ${label} row`}
+            onClick={addRow}
+            disabled={editorMode === 'bulk'}
+          >
+            <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </button>
           <button className={styles.iconButton} type="button" aria-label={`${label} help`}>
             <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
@@ -194,7 +208,7 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
           <thead>
             <tr>
               <th scope="col" className={styles.gripHeader}>
-                <span className="sr-only">Row</span>
+                <span className="sr-only">Row controls</span>
               </th>
               <th scope="col">Key</th>
               <th scope="col">Value</th>
@@ -206,9 +220,7 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
             {effectiveRows.map((row, index) => (
               <tr key={row.id || index}>
                 <td className={styles.gripCell}>
-                  <button type="button" className={styles.gripButton} aria-label={`Reorder ${label} row ${index + 1}`}>
-                    ⋮⋮
-                  </button>
+                  <span className={styles.rowMarker} aria-hidden="true">⋮</span>
                 </td>
                 <td>
                   <input
@@ -240,16 +252,18 @@ export function KeyValueEditor({ label, mode = 'params', rows = [], onChange, ke
                 ) : null}
                 {showActions ? (
                   <td className={styles.rowActions}>
-                    <button
-                      type="button"
-                      className={styles.actionOk}
-                      onClick={() => onChange(withDraftRow(effectiveRows))}
-                      aria-label={`Commit ${label} row ${index + 1}`}
-                    >
-                      <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 6 9 17l-5-5" />
-                      </svg>
-                    </button>
+                    {showCommitAction ? (
+                      <button
+                        type="button"
+                        className={styles.actionOk}
+                        onClick={() => commitRows(effectiveRows)}
+                        aria-label={`Commit ${label} row ${index + 1}`}
+                      >
+                        <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      </button>
+                    ) : null}
                     <button type="button" className={styles.actionDelete} onClick={() => removeRow(index)} aria-label={`Delete ${label} row ${index + 1}`}>
                       <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 6 6 18" />

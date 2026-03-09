@@ -34,7 +34,7 @@ function createDefaultRequest() {
     id: `req-${Date.now()}`,
     name: 'Untitled',
     method: 'GET',
-    url: 'http://localhost:4444/api/users',
+    url: 'https://petstore.swagger.io/v2/pet/findByStatus?status=available',
     params: [makeRow()],
     headers: [makeRow()],
     body: {
