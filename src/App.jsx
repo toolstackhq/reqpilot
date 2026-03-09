@@ -567,40 +567,57 @@ export default function App() {
 
         <nav className={styles.rightRail} aria-label="Workspace tools">
           <button
-            className={styles.railButton}
+            className={`${styles.railButton} ${styles.railToolCollections}`}
             type="button"
             aria-label="Collections"
             title="Collections"
             onClick={() => document.getElementById('collections-panel')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            C
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3.5 7.4a2 2 0 0 1 2-2H10l1.3 1.6h7.2a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2z" />
+            </svg>
+            <span className={styles.railLabel}>COL</span>
           </button>
           <button
-            className={styles.railButton}
+            className={`${styles.railButton} ${styles.railToolEnv}`}
             type="button"
             aria-label="Environments"
             title="Environments"
             onClick={() => setShowEnvManager(true)}
           >
-            E
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.4" />
+              <path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h7" />
+            </svg>
+            <span className={styles.railLabel}>ENV</span>
           </button>
           <button
-            className={styles.railButton}
+            className={`${styles.railButton} ${styles.railToolHistory}`}
             type="button"
             aria-label="History"
             title="History"
             onClick={() => setShowHistory(true)}
           >
-            H
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3.5 12a8.5 8.5 0 1 0 2.2-5.7" />
+              <path d="M3.5 4.7v3.8h3.8" />
+              <path d="M12 8v4.2l2.8 1.8" />
+            </svg>
+            <span className={styles.railLabel}>HIST</span>
           </button>
           <button
-            className={styles.railButton}
+            className={`${styles.railButton} ${styles.railToolConsole}`}
             type="button"
             aria-label="Console"
             title="Console"
             onClick={() => setShowConsole(true)}
           >
-            L
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4.5 6.2h15a1.6 1.6 0 0 1 1.6 1.6v8.4a1.6 1.6 0 0 1-1.6 1.6h-15a1.6 1.6 0 0 1-1.6-1.6V7.8a1.6 1.6 0 0 1 1.6-1.6z" />
+              <path d="m8.3 10.2 2.1 1.8-2.1 1.8" />
+              <path d="M12.8 14h2.9" />
+            </svg>
+            <span className={styles.railLabel}>LOG</span>
           </button>
         </nav>
 
