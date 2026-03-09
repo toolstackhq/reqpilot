@@ -1,30 +1,57 @@
 import { useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'reqpilot_collections';
+const STORAGE_KEY = 'reqpilot_collections_v2';
 
-function loadCollections() {
+function loadCollectionMap() {
   try {
-    return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]');
+    const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
   } catch {
-    return [];
+    // noop
   }
+
+  // migration from v1 flat structure
+  try {
+    const legacy = JSON.parse(window.localStorage.getItem('reqpilot_collections') || '[]');
+    if (Array.isArray(legacy)) {
+      return { 'ws-personal': legacy };
+    }
+  } catch {
+    // noop
+  }
+
+  return {};
 }
 
-export function useCollections() {
-  const [collections, setCollections] = useState(() => (typeof window === 'undefined' ? [] : loadCollections()));
+export function useCollections(workspaceId = 'ws-personal') {
+  const [collectionMap, setCollectionMap] = useState(() => (typeof window === 'undefined' ? {} : loadCollectionMap()));
+  const collections = collectionMap[workspaceId] || [];
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(collections));
-  }, [collections]);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(collectionMap));
+  }, [collectionMap]);
+
+  function updateWorkspaceCollections(updater) {
+    setCollectionMap((prev) => {
+      const current = prev[workspaceId] || [];
+      const nextCollections = updater(current);
+      return {
+        ...prev,
+        [workspaceId]: nextCollections,
+      };
+    });
+  }
 
   const createCollection = (name) => {
     const collection = { id: `col-${Date.now()}`, name, requests: [] };
-    setCollections((prev) => [collection, ...prev]);
+    updateWorkspaceCollections((prev) => [collection, ...prev]);
     return collection;
   };
 
   const saveRequestToCollection = (collectionId, request, name) => {
-    setCollections((prev) =>
+    updateWorkspaceCollections((prev) =>
       prev.map((collection) => {
         if (collection.id !== collectionId) {
           return collection;
@@ -45,11 +72,11 @@ export function useCollections() {
   };
 
   const importCollection = (collection) => {
-    setCollections((prev) => [collection, ...prev]);
+    updateWorkspaceCollections((prev) => [collection, ...prev]);
   };
 
   const replaceAllCollections = (nextCollections) => {
-    setCollections(nextCollections);
+    updateWorkspaceCollections(() => nextCollections);
   };
 
   return {

@@ -1,30 +1,54 @@
 import { useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'reqpilot_console';
+const STORAGE_KEY = 'reqpilot_console_v2';
 const MAX_ENTRIES = 300;
 
-function loadConsoleEntries() {
+function loadConsoleMap() {
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
   } catch {
-    return [];
+    // noop
   }
+
+  try {
+    const legacy = JSON.parse(window.localStorage.getItem('reqpilot_console') || '[]');
+    if (Array.isArray(legacy)) {
+      return { 'ws-personal': legacy };
+    }
+  } catch {
+    // noop
+  }
+
+  return {};
 }
 
-export function useConsole() {
-  const [entries, setEntries] = useState(() => (typeof window === 'undefined' ? [] : loadConsoleEntries()));
+export function useConsole(workspaceId = 'ws-personal') {
+  const [entryMap, setEntryMap] = useState(() => (typeof window === 'undefined' ? {} : loadConsoleMap()));
+  const entries = entryMap[workspaceId] || [];
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }, [entries]);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entryMap));
+  }, [entryMap]);
+
+  function updateWorkspaceEntries(updater) {
+    setEntryMap((prev) => {
+      const current = prev[workspaceId] || [];
+      return {
+        ...prev,
+        [workspaceId]: updater(current),
+      };
+    });
+  }
 
   function addEntry(entry) {
-    setEntries((prev) => [entry, ...prev].slice(0, MAX_ENTRIES));
+    updateWorkspaceEntries((prev) => [entry, ...prev].slice(0, MAX_ENTRIES));
   }
 
   function clearEntries() {
-    setEntries([]);
+    updateWorkspaceEntries(() => []);
   }
 
   return {
