@@ -196,18 +196,25 @@
   color: var(--method-patch);
 }
 
+.railToolCollections {
+  color: var(--method-get);
+}
+
+.railToolEnv {
+  color: var(--method-options);
+}
+
+.railToolHistory {
+  color: var(--method-post);
+}
+
+.railToolConsole {
+  color: var(--method-put);
+}
+
 .railButtonFuture {
   opacity: 0.8;
   cursor: pointer;
-}
-
-.rightRail .railButton {
-  min-height: 2.35rem;
-  gap: 0;
-}
-
-.rightRail .railLabel {
-  display: none;
 }
 
 .railButtonFuture:hover {
