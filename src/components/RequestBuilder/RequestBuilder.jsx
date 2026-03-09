@@ -54,7 +54,7 @@ function isFilledRow(row = {}) {
   return Boolean((row.key || '').trim() || (row.value || '').trim() || (row.description || '').trim());
 }
 
-function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel, snippetNames, onAppendSnippet }) {
+function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel, docUrl, snippetNames, onAppendSnippet }) {
   const scriptHighlightRef = useRef(null);
   const lineNumbers = useMemo(
     () => Array.from({ length: Math.max(1, value.split('\n').length) }, (_, index) => index + 1).join('\n'),
@@ -74,6 +74,18 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
     onChange(formatted);
   }
 
+  function openDocs() {
+    if (!docUrl) return;
+    window.open(docUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  function clearScript() {
+    if (!value?.trim()) return;
+    const confirmed = window.confirm(`Clear ${title}?`);
+    if (!confirmed) return;
+    onChange('');
+  }
+
   return (
     <div className={styles.scriptSplit}>
       <section className={styles.scriptMain}>
@@ -83,14 +95,20 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
             <button className={styles.formatButton} type="button" aria-label={`Format ${title}`} onClick={formatScript}>
               Format
             </button>
-            <button className={styles.iconButton} type="button" aria-label={`${title} help`}>
+            <button className={styles.iconButton} type="button" aria-label={`${title} help`} onClick={openDocs}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                 <path d="M12 17h.01" />
               </svg>
             </button>
-            <button className={styles.iconButton} type="button" aria-label={`Clear ${title}`} onClick={() => onChange('')}>
+            <button
+              className={styles.iconButton}
+              type="button"
+              aria-label={`Clear ${title}`}
+              onClick={clearScript}
+              disabled={!value?.trim()}
+            >
               <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" />
                 <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -133,7 +151,9 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
 
       <aside className={styles.scriptAside}>
         <p className={styles.scriptHelp}>{intro}</p>
-        <a className={styles.docLink} href="#" onClick={(event) => event.preventDefault()}>
+        <a className={styles.docLink} href={docUrl || '#'} target="_blank" rel="noopener noreferrer" onClick={(event) => {
+          if (!docUrl) event.preventDefault();
+        }}>
           {docLabel}
         </a>
 
@@ -413,6 +433,7 @@ export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSen
             placeholder="rp.request.headers.set('X-Time', Date.now())"
             intro="Pre-request scripts are written in JavaScript, and are run before the request is sent."
             docLabel="Read documentation"
+            docUrl="https://toolstackhq.github.io/reqpilot/request-testing"
             snippetNames={preScriptSnippets}
             onAppendSnippet={(name) => updateScripts('preRequest', `${request.scripts.preRequest || ''}\n${SNIPPETS[name]}`.trim())}
           />
@@ -426,6 +447,7 @@ export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSen
             placeholder="rp.env.set('token', rp.response.json().token)"
             intro="Post-request scripts are written in JavaScript, and are run after the response is received."
             docLabel="Read documentation"
+            docUrl="https://toolstackhq.github.io/reqpilot/request-testing"
             snippetNames={postScriptSnippets}
             onAppendSnippet={(name) => updateScripts('postRequest', `${request.scripts.postRequest || ''}\n${SNIPPETS[name]}`.trim())}
           />

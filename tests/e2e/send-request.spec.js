@@ -74,6 +74,21 @@ test('post-request script tests show up in Test Results', async ({ page }) => {
   await expect(page.locator('[aria-label="Response Viewer"]')).toContainText('status from post');
 });
 
+test('script clear button clears editor after confirmation', async ({ page }) => {
+  const requestTabs = page.getByLabel('Request tabs');
+
+  await page.goto('/');
+  await requestTabs.getByRole('tab', { name: 'Pre-request Script' }).click();
+
+  const editor = page.locator('#pre-script');
+  await editor.fill("rp.env.set('x', '1')");
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.getByRole('button', { name: 'Clear Pre-request script' }).click();
+
+  await expect(editor).toHaveValue('');
+});
+
 test('new tab button creates and switches to a fresh request tab', async ({ page }) => {
   const workspaceTabs = page.getByLabel('Request workspace tabs');
 
