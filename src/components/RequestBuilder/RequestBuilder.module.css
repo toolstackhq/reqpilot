@@ -581,6 +581,68 @@
   min-height: 0;
 }
 
+.headersPane {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.defaultHeadersPanel {
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in oklab, var(--surface-soft) 85%, transparent);
+  padding: 0.55rem 0.7rem;
+}
+
+.defaultHeadersTitle {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.defaultHeadersList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.defaultHeadersItem {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.55rem;
+  background: var(--surface);
+  padding: 0.28rem 0.44rem;
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) minmax(0, 1fr);
+  gap: 0.46rem;
+  align-items: center;
+}
+
+.defaultHeaderKey {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.defaultHeaderValue {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.defaultHeadersEmpty {
+  margin: 0;
+  font-size: 0.71rem;
+  color: var(--text-muted);
+}
+
 .bulkEditWrap {
   flex: 1;
   min-height: 0;

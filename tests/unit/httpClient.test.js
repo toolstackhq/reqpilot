@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildProxyPayload } from '../../src/utils/httpClient.js';
+import { buildProxyPayload, getDefaultHeadersPreview } from '../../src/utils/httpClient.js';
 
 describe('httpClient', () => {
   test('builds payload, strips disabled headers, and keeps explicit headers', () => {
@@ -94,5 +94,33 @@ describe('httpClient', () => {
     expect(payload.security.cert).toContain('BEGIN CERTIFICATE');
     expect(payload.security.key).toContain('BEGIN PRIVATE KEY');
     expect(payload.security.passphrase).toBe('secret');
+  });
+
+  test('returns default header preview for json post', () => {
+    const defaults = getDefaultHeadersPreview({
+      method: 'POST',
+      url: 'http://localhost:4444/api/users',
+      headers: [],
+      body: { type: 'json', raw: '{"hello":"world"}', form: [] },
+    });
+
+    expect(defaults).toEqual([
+      { key: 'Accept', value: '*/*' },
+      { key: 'Content-Type', value: 'application/json' },
+    ]);
+  });
+
+  test('default header preview excludes user-overridden headers', () => {
+    const defaults = getDefaultHeadersPreview({
+      method: 'POST',
+      url: 'http://localhost:4444/api/users',
+      headers: [
+        { key: 'accept', value: 'application/json', enabled: true },
+        { key: 'Content-Type', value: 'application/custom', enabled: true },
+      ],
+      body: { type: 'json', raw: '{"hello":"world"}', form: [] },
+    });
+
+    expect(defaults).toEqual([]);
   });
 });

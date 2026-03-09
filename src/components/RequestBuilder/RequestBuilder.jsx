@@ -415,6 +415,7 @@ export function RequestBuilder({ request, onRequestChange, onSend, onSave, isSen
         {tab === 'Parameters' && <ParamsEditor rows={toRows(request.params)} onChange={setParams} />}
         {tab === 'Headers' && (
           <HeadersEditor
+            request={request}
             rows={toRows(request.headers)}
             onChange={(headers) => onRequestChange({ ...request, headers })}
           />
