@@ -41,7 +41,11 @@
 .workspaceHeading {
   margin: 0.12rem 0 0;
   color: var(--text-primary);
-  font-size: 0.8rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header button,
@@ -64,6 +68,8 @@
 .actions {
   display: flex;
   gap: 0.3rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .searchWrap {
