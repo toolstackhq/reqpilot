@@ -19,15 +19,20 @@ function levelClass(level = '') {
 
 function fallbackLogEntries(entry = {}) {
   if (entry.logEntries?.length) {
-    return entry.logEntries;
+    return entry.logEntries
+      .map((line) => ({
+        ...line,
+        message: String(line?.message || '').trim(),
+      }))
+      .filter((line) => line.message);
   }
   if (entry.logs?.length) {
     return entry.logs.map((line) => ({
       level: 'log',
       phase: 'script',
-      message: String(line),
+      message: String(line || '').trim(),
       timestamp: entry.timestamp,
-    }));
+    })).filter((line) => line.message);
   }
   return [];
 }

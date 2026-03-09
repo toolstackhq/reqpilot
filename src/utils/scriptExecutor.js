@@ -61,9 +61,14 @@ function maybeDetectInfiniteLoop(script) {
 
 function serializeLogValue(value) {
   if (typeof value === 'string') return value;
+  if (value === undefined) return 'undefined';
+  if (typeof value === 'function') return `[Function ${value.name || 'anonymous'}]`;
+  if (typeof value === 'symbol') return String(value);
   if (value instanceof Error) return value.message;
   try {
-    return JSON.stringify(value);
+    const serialized = JSON.stringify(value);
+    if (serialized === undefined) return String(value);
+    return serialized;
   } catch {
     return String(value);
   }
@@ -188,10 +193,19 @@ export function executeScript({
 
   function pushLog(level, args) {
     const rendered = args.map(serializeLogValue).join(' ');
-    logs.push(rendered);
+    const normalized = rendered
+      .replace(/\r\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    if (!normalized) {
+      return;
+    }
+
+    logs.push(normalized);
     logEntries.push({
       level,
-      message: rendered,
+      message: normalized,
       phase,
       timestamp: new Date().toISOString(),
     });

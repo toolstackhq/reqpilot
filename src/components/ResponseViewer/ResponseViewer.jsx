@@ -36,6 +36,10 @@ export function ResponseViewer({ response }) {
       return null;
     }
   }, [isJson, renderedBody]);
+  const visibleLogs = useMemo(
+    () => (response?.logs || []).map((line) => String(line || '').trim()).filter(Boolean),
+    [response?.logs]
+  );
 
   if (!response) {
     return <div className={styles.emptyState}>No response yet</div>;
@@ -154,11 +158,11 @@ export function ResponseViewer({ response }) {
         {tab === 'Test Results' && <TestResults tests={response.testResults || []} />}
       </section>
 
-      {response.logs?.length ? (
+      {visibleLogs.length ? (
         <section className={styles.console}>
           <h3>Script Console</h3>
           <ul>
-            {response.logs.map((line, index) => (
+            {visibleLogs.map((line, index) => (
               <li key={`${line}-${index}`}>{line}</li>
             ))}
           </ul>

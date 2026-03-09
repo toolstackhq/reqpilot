@@ -98,6 +98,24 @@ describe('scriptExecutor', () => {
     expect(result.testResults[0].pass).toBe(true);
   });
 
+  test('logger serializes undefined/functions and skips empty lines', () => {
+    const result = executeScript({
+      script: `
+        function helper() {}
+        console.log();
+        console.log(undefined);
+        console.log(helper);
+      `,
+      request: createRequest(),
+      response: { status: 200, body: '{}', headers: {} },
+      environment: {},
+    });
+
+    expect(result.logs).toHaveLength(2);
+    expect(result.logs[0]).toBe('undefined');
+    expect(result.logs[1]).toContain('[Function helper]');
+  });
+
   test('syntax errors are captured', () => {
     const result = executeScript({
       script: 'rp.test(',
