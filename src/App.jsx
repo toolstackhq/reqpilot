@@ -442,7 +442,13 @@ export default function App() {
               document.getElementById('request-url-input')?.focus();
             }}
           >
-            R
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 7h13" />
+              <path d="M5 12h8" />
+              <path d="M5 17h13" />
+              <path d="m14 5 4 2-4 2" />
+            </svg>
+            <span className={styles.railLabel}>REST</span>
           </button>
           <button
             className={`${styles.railButton} ${styles.railModeGrpc} ${styles.railButtonFuture}`}
@@ -451,7 +457,14 @@ export default function App() {
             title="gRPC (coming soon)"
             onClick={() => setComingSoonFeature('grpc')}
           >
-            g
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="6" cy="12" r="2.1" />
+              <circle cx="18" cy="7" r="2.1" />
+              <circle cx="18" cy="17" r="2.1" />
+              <path d="M8 11l7-3" />
+              <path d="M8 13l7 3" />
+            </svg>
+            <span className={styles.railLabel}>gRPC</span>
           </button>
           <button
             className={`${styles.railButton} ${styles.railModeGraphql} ${styles.railButtonFuture}`}
@@ -460,7 +473,16 @@ export default function App() {
             title="GraphQL (coming soon)"
             onClick={() => setComingSoonFeature('graphql')}
           >
-            G
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polygon points="12,3.8 19.4,8.1 19.4,15.9 12,20.2 4.6,15.9 4.6,8.1" />
+              <circle cx="12" cy="3.8" r="1.5" />
+              <circle cx="19.4" cy="8.1" r="1.5" />
+              <circle cx="19.4" cy="15.9" r="1.5" />
+              <circle cx="12" cy="20.2" r="1.5" />
+              <circle cx="4.6" cy="15.9" r="1.5" />
+              <circle cx="4.6" cy="8.1" r="1.5" />
+            </svg>
+            <span className={styles.railLabel}>GQL</span>
           </button>
           <button
             className={`${styles.railButton} ${styles.railModeWs} ${styles.railButtonFuture}`}
@@ -469,7 +491,13 @@ export default function App() {
             title="WebSocket (coming soon)"
             onClick={() => setComingSoonFeature('websocket')}
           >
-            W
+            <svg className={styles.railIcon} viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 8a12 12 0 0 1 16 0" />
+              <path d="M7 11a8 8 0 0 1 10 0" />
+              <path d="M10 14a4 4 0 0 1 4 0" />
+              <circle cx="12" cy="17" r="1.8" />
+            </svg>
+            <span className={styles.railLabel}>WS</span>
           </button>
         </nav>
 
