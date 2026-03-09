@@ -1,5 +1,5 @@
 {
-  "name": "reqpilot",
+  "name": "@toolstackhq/reqpilot",
   "version": "1.0.0",
   "description": "Lightweight local-first REST API client. Modern Postman alternative.",
   "type": "module",
@@ -29,6 +29,9 @@
     "dist/**",
     "src/server/**"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "express": "^4.19.2",
     "js-yaml": "^4.1.0",

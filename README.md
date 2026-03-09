@@ -17,13 +17,13 @@ Modern REST API client with a clean, fast workflow for request building, testing
 Browser-first CLI usage (cross-platform):
 
 ```bash
-npx reqpilot
+npx @toolstackhq/reqpilot
 ```
 
 or install globally:
 
 ```bash
-npm i -g reqpilot
+npm i -g @toolstackhq/reqpilot
 reqpilot
 ```
 
