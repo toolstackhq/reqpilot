@@ -8,7 +8,8 @@ export function startServer({
   port = Number(process.env.PORT) || 5489,
   openBrowser = process.env.REQPILOT_NO_OPEN !== '1',
 } = {}) {
-  const app = createProxyApp({ staticDir: path.resolve(process.cwd(), 'dist') });
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const app = createProxyApp({ staticDir: path.resolve(here, 'dist') });
   const server = app.listen(port, () => {
     console.log('┌──────────────────────────────────────┐');
     console.log('│  ReqPilot v1.0.0                     │');

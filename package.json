@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prepack": "npm run build",
     "scaffold:desktop-wrapper": "node scripts/scaffold-desktop-wrapper.mjs",
     "desktop:build": "node scripts/build-desktop-wrapper.mjs",
     "docs:dev": "vitepress dev docs",
@@ -25,7 +26,8 @@
   },
   "files": [
     "server.js",
-    "dist/**"
+    "dist/**",
+    "src/server/**"
   ],
   "dependencies": {
     "express": "^4.19.2",
