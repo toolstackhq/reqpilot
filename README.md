@@ -77,6 +77,18 @@ reqpilot
 
 `release-publish.yml` publishes to npm and creates GitHub release notes when you push a semver tag (`v*.*.*`).
 
+### Current Release Strategy
+
+ReqPilot currently uses a **manual release trigger** (tag push).  
+This is intentional for now: you control exactly when a public npm release is published.
+
+In practice:
+
+1. merge changes to `main`
+2. choose the version
+3. push a matching tag
+4. CI/CD handles test, build, publish, and GitHub release notes
+
 ### 1. Add npm token in GitHub
 
 Repository settings:
@@ -93,13 +105,24 @@ your npm automation token from npmjs.com.
 
 ### 2. Cut a release
 
-1. Update `package.json` version.
+1. Update `package.json` version (must match tag).
 2. Commit and push to `main`.
 3. Create and push a matching tag:
 
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
+```
+
+Example for next patch release:
+
+```bash
+# package.json -> 1.0.1
+git add package.json package-lock.json
+git commit -m "chore(release): 1.0.1"
+git push origin main
+git tag v1.0.1
+git push origin v1.0.1
 ```
 
 The workflow will:
