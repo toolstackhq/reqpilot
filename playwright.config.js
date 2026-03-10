@@ -20,7 +20,7 @@ export default defineConfig({
       reuseExistingServer: true,
     },
     {
-      command: 'npm run dev',
+      command: 'npm run dev:ui',
       port: 5173,
       reuseExistingServer: true,
     },
