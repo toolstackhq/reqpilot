@@ -2,14 +2,13 @@ name: Tests
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   unit-and-integration:
@@ -31,11 +30,13 @@ jobs:
         run: npm run test:coverage
 
       - name: Upload coverage to Codecov
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           fail_ci_if_error: false
-          use_oidc: true
+          verbose: true
 
   e2e:
     runs-on: ubuntu-latest
