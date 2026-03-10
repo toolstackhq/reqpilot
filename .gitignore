@@ -6,6 +6,7 @@ playwright-report/
 tmp/
 t/
 h*.png
+!docs/public/screenshots/history-drawer.png
 dist/
 desktop-wrapper/
 docs/.vitepress/dist/
