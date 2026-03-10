@@ -1,6 +1,6 @@
 {
   "name": "@toolstackhq/reqpilot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Lightweight local-first REST API client. Modern Postman alternative.",
   "type": "module",
   "bin": {
