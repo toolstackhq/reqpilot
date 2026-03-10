@@ -84,6 +84,7 @@
 }
 
 .workspaceSelect,
+.workspaceManage,
 .navButton,
 .navButtonGhost {
   border: 1px solid var(--border);
@@ -104,6 +105,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.workspaceManage {
+  color: #35518a;
+  background: color-mix(in oklab, var(--surface) 92%, #f3f7ff);
+  border-color: var(--border-soft);
 }
 
 .navButton {

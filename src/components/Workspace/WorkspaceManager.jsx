@@ -112,7 +112,10 @@ export function WorkspaceManager({
       <button type="button" className={styles.overlay} aria-hidden="true" onClick={onClose} />
       <section className={styles.modal} role="dialog" aria-modal="true" aria-label="Workspace Manager">
         <header className={styles.header}>
-          <h2>Workspace Manager</h2>
+          <div className={styles.headerCopy}>
+            <h2>Workspace Manager</h2>
+            <p>Switch workspaces and configure Git sync safely.</p>
+          </div>
           <button type="button" className={styles.close} onClick={onClose}>
             Close
           </button>
@@ -133,53 +136,64 @@ export function WorkspaceManager({
                       <span className={styles.workspaceName}>{workspace.name}</span>
                       {isActive ? <span className={styles.badge}>Active</span> : null}
                     </div>
-                    <span className={styles.workspaceMeta}>
-                      Created {formatWorkspaceDate(workspace.createdAt)}
-                    </span>
-                    <span className={styles.workspaceMeta}>
-                      {workspace.repoPath ? `Git: ${workspace.repoPath}` : 'Git not configured'}
-                    </span>
-                    <button
-                      type="button"
-                      className={styles.openButton}
-                      onClick={() => onSelectWorkspace(workspace.id)}
-                      disabled={isActive}
-                    >
-                      {isActive ? 'Opened' : 'Open'}
-                    </button>
+                    <span className={styles.workspaceMeta}>{workspace.repoPath ? 'Git connected' : 'Git not connected'}</span>
+                    <div className={styles.workspaceCardActions}>
+                      <span className={styles.workspaceMeta}>Created {formatWorkspaceDate(workspace.createdAt)}</span>
+                      {isActive ? (
+                        <span className={styles.statePill}>Opened</span>
+                      ) : (
+                        <button type="button" className={styles.openButton} onClick={() => onSelectWorkspace(workspace.id)}>
+                          Open
+                        </button>
+                      )}
+                    </div>
                   </article>
                 );
               })}
             </div>
-
-            <form className={styles.form} onSubmit={onCreateSubmit}>
-              <span className={styles.label}>Create Workspace</span>
-              <input
-                className={styles.input}
-                value={nameInput}
-                onChange={(event) => setNameInput(event.target.value)}
-                placeholder="Workspace name"
-                aria-label="New workspace name"
-              />
-              <input
-                className={styles.input}
-                value={repoInput}
-                onChange={(event) => setRepoInput(event.target.value)}
-                placeholder="Optional git repo path"
-                aria-label="New workspace git repo path"
-              />
-              <button type="submit" className={styles.createButton}>
-                Create & Open
-              </button>
-            </form>
+            <p className={styles.sidebarHint}>Tip: use the top bar workspace menu to reopen this manager anytime.</p>
           </aside>
 
           <div className={styles.main}>
             <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>Active Workspace</h3>
-              <p className={styles.meta}>
-                {activeWorkspace?.name || 'Workspace'}
-              </p>
+              <h3 className={styles.sectionTitle}>Create Workspace</h3>
+              <form className={styles.createInline} onSubmit={onCreateSubmit}>
+                <input
+                  className={styles.input}
+                  value={nameInput}
+                  onChange={(event) => setNameInput(event.target.value)}
+                  placeholder="Workspace name"
+                  aria-label="New workspace name"
+                />
+                <input
+                  className={styles.input}
+                  value={repoInput}
+                  onChange={(event) => setRepoInput(event.target.value)}
+                  placeholder="Optional git repo path"
+                  aria-label="New workspace git repo path"
+                />
+                <button type="submit" className={styles.createButton}>
+                  Create & Open
+                </button>
+              </form>
+            </section>
+
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>Selected Workspace</h3>
+              <dl className={styles.metaGrid}>
+                <div>
+                  <dt>Name</dt>
+                  <dd>{activeWorkspace?.name || 'Workspace'}</dd>
+                </div>
+                <div>
+                  <dt>Created</dt>
+                  <dd>{formatWorkspaceDate(activeWorkspace?.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt>Git</dt>
+                  <dd>{hasGitRepo ? 'Connected' : 'Not connected'}</dd>
+                </div>
+              </dl>
               <div className={styles.row}>
                 <input
                   className={styles.input}
@@ -189,7 +203,7 @@ export function WorkspaceManager({
                   aria-label="Workspace git repository path"
                 />
                 <button type="button" className={styles.action} onClick={saveRepoPath}>
-                  Save Path
+                  Save
                 </button>
                 <button
                   type="button"

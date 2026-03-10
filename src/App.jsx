@@ -509,6 +509,15 @@ export default function App() {
           >
             {activeWorkspace?.name || 'Workspace'} ▾
           </button>
+          <button
+            type="button"
+            className={styles.workspaceManage}
+            onClick={() => setShowWorkspaceManager(true)}
+            aria-label="Manage workspaces"
+            title="Manage workspaces"
+          >
+            Manage
+          </button>
         </div>
         <div className={styles.commandSearch} role="search">
           <input
