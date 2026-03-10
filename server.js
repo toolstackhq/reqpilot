@@ -10,11 +10,20 @@ export function startServer({
   openBrowser = process.env.REQPILOT_NO_OPEN !== '1',
 } = {}) {
   const here = path.dirname(fileURLToPath(import.meta.url));
+  const formatBannerLine = (text) => `│ ${String(text).padEnd(36)} │`;
+  let version = 'dev';
+  try {
+    const packageJsonPath = path.resolve(here, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    version = packageJson.version || version;
+  } catch {
+    // noop
+  }
   const app = createProxyApp({ staticDir: path.resolve(here, 'dist') });
   const server = app.listen(port, () => {
     console.log('┌──────────────────────────────────────┐');
-    console.log('│  ReqPilot v1.0.0                     │');
-    console.log(`│  Running on http://localhost:${port}      │`);
+    console.log(formatBannerLine(`ReqPilot v${version}`));
+    console.log(formatBannerLine(`Running on http://localhost:${port}`));
     console.log('└──────────────────────────────────────┘');
 
     if (openBrowser) {
@@ -34,6 +43,7 @@ export function startServer({
 
 const current = fileURLToPath(import.meta.url);
 const invokedPath = process.argv[1];
+const invokedBase = invokedPath ? path.basename(invokedPath) : '';
 
 if (invokedPath) {
   try {
@@ -44,7 +54,7 @@ if (invokedPath) {
     }
   } catch {
     // Fallback to previous behavior if symlink resolution fails.
-    if (path.resolve(invokedPath) === current) {
+    if (path.resolve(invokedPath) === current || invokedBase === 'reqpilot') {
       startServer();
     }
   }

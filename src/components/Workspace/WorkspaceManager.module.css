@@ -178,6 +178,11 @@
   font-size: 0.74rem;
 }
 
+.inputReadonly {
+  background: color-mix(in oklab, var(--surface-soft) 88%, transparent);
+  color: var(--text-muted);
+}
+
 .createButton {
   border: 1px solid var(--accent-primary);
   background: var(--accent-primary);
@@ -192,6 +197,18 @@
 .createInline {
   display: grid;
   gap: 0.45rem;
+}
+
+.toggleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.toggleRow input {
+  accent-color: var(--accent-primary);
 }
 
 .metaGrid {

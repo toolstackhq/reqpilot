@@ -2,6 +2,7 @@ import express from 'express';
 import fs from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
+import os from 'node:os';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -101,6 +102,120 @@ export function parseGitStatusOutput(output = '') {
 function hasGitConflict(result = {}) {
   const combined = `${result.stdout || ''}\n${result.stderr || ''}`;
   return /CONFLICT|Resolve all conflicts|Automatic merge failed/i.test(combined);
+}
+
+function joinCommandOutput(result = {}) {
+  return [result.stdout, result.stderr]
+    .filter(Boolean)
+    .map((entry) => String(entry).trim())
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+function safeWorkspaceRoot() {
+  const custom = String(process.env.REQPILOT_WORKSPACES_ROOT || '').trim();
+  if (custom) return path.resolve(custom);
+  return path.join(os.homedir(), '.reqpilot', 'workspaces');
+}
+
+function slugifyName(value = '') {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40) || 'workspace';
+}
+
+function workspaceFolderName({ workspaceId, name }) {
+  const suffix = String(workspaceId || `${Date.now()}`)
+    .replace(/[^a-zA-Z0-9]+/g, '')
+    .slice(-8)
+    .toLowerCase();
+  return `${slugifyName(name)}-${suffix || Date.now()}`;
+}
+
+function writeFileIfMissing(filePath, content) {
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, content, 'utf8');
+  }
+}
+
+function ensureWorkspaceLayout({ workspaceId, name }) {
+  const root = safeWorkspaceRoot();
+  const folder = workspaceFolderName({ workspaceId, name });
+  const workspacePath = path.join(root, folder);
+  const reqpilotPath = path.join(workspacePath, '.reqpilot');
+  const collectionsPath = path.join(reqpilotPath, 'collections');
+  const environmentsPath = path.join(reqpilotPath, 'environments');
+
+  fs.mkdirSync(collectionsPath, { recursive: true });
+  fs.mkdirSync(environmentsPath, { recursive: true });
+
+  writeFileIfMissing(path.join(collectionsPath, '.gitkeep'), '');
+  writeFileIfMissing(path.join(environmentsPath, '.gitkeep'), '');
+
+  writeFileIfMissing(
+    path.join(reqpilotPath, 'workspace.json'),
+    `${JSON.stringify(
+      {
+        id: workspaceId,
+        name,
+        createdAt: new Date().toISOString(),
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  writeFileIfMissing(
+    path.join(reqpilotPath, 'README.md'),
+    [
+      '# ReqPilot Workspace',
+      '',
+      'Git-native API assets for this workspace:',
+      '',
+      '- `collections/` for request collections',
+      '- `environments/` for environment sets',
+      '',
+      'Use ReqPilot workspace Git actions for fetch/pull/stage/commit/push.',
+      '',
+    ].join('\n')
+  );
+
+  return {
+    workspacePath,
+    reqpilotPath,
+    collectionsPath,
+    environmentsPath,
+  };
+}
+
+async function ensureGitRepoInitialized(repoPath) {
+  const gitDir = path.join(repoPath, '.git');
+  if (fs.existsSync(gitDir)) {
+    return { ok: true, initialized: false, stdout: '', stderr: '' };
+  }
+
+  let result = await runGitCommand(repoPath, ['init', '-b', 'main']);
+  if (!result.ok) {
+    result = await runGitCommand(repoPath, ['init']);
+    if (result.ok) {
+      await runGitCommand(repoPath, ['branch', '-M', 'main']);
+    }
+  }
+
+  return {
+    ...result,
+    initialized: result.ok,
+  };
+}
+
+async function setOriginRemote(repoPath, remoteUrl) {
+  const origin = await runGitCommand(repoPath, ['remote', 'get-url', 'origin']);
+  if (origin.ok) {
+    return runGitCommand(repoPath, ['remote', 'set-url', 'origin', remoteUrl]);
+  }
+  return runGitCommand(repoPath, ['remote', 'add', 'origin', remoteUrl]);
 }
 
 export async function executeProxyRequest({ method, url, headers, body, security }) {
@@ -306,10 +421,207 @@ export function createProxyApp({ staticDir } = {}) {
     res.status(result.ok ? 200 : 500).json(result);
   });
 
+  app.post('/workspace/bootstrap', async (req, res) => {
+    const workspaceId = String(req.body?.workspaceId || '').trim();
+    const name = String(req.body?.name || '').trim();
+    const remoteUrl = String(req.body?.remoteUrl || '').trim();
+
+    if (!workspaceId || !name) {
+      res.status(400).json({ ok: false, error: 'workspaceId and name are required' });
+      return;
+    }
+
+    try {
+      const { workspacePath } = ensureWorkspaceLayout({ workspaceId, name });
+      const logs = [];
+      const warnings = [];
+
+      const initResult = await ensureGitRepoInitialized(workspacePath);
+      if (!initResult.ok) {
+        res.status(500).json({
+          ok: false,
+          error: 'Failed to initialize Git repository',
+          workspacePath,
+          repoPath: workspacePath,
+          ...initResult,
+        });
+        return;
+      }
+      if (joinCommandOutput(initResult)) logs.push(`git init\n${joinCommandOutput(initResult)}`);
+
+      const addResult = await runGitCommand(workspacePath, ['add', '-A']);
+      if (!addResult.ok) {
+        res.status(500).json({
+          ok: false,
+          error: 'Failed to stage workspace files',
+          workspacePath,
+          repoPath: workspacePath,
+          ...addResult,
+        });
+        return;
+      }
+
+      const stagedStatus = await runGitCommand(workspacePath, ['status', '--porcelain']);
+      if (stagedStatus.ok && stagedStatus.stdout.trim()) {
+        const commitResult = await runGitCommand(workspacePath, ['commit', '-m', 'chore: bootstrap reqpilot workspace']);
+        if (!commitResult.ok) {
+          warnings.push(
+            'Initial commit was not created. Configure Git user.name/user.email and use Publish later.'
+          );
+          logs.push(`git commit\n${joinCommandOutput(commitResult)}`);
+        } else if (joinCommandOutput(commitResult)) {
+          logs.push(`git commit\n${joinCommandOutput(commitResult)}`);
+        }
+      }
+
+      let remoteSet = false;
+      let pushed = false;
+      if (remoteUrl) {
+        const remoteResult = await setOriginRemote(workspacePath, remoteUrl);
+        if (!remoteResult.ok) {
+          res.status(500).json({
+            ok: false,
+            error: 'Failed to configure origin remote',
+            workspacePath,
+            repoPath: workspacePath,
+            remoteUrl,
+            ...remoteResult,
+          });
+          return;
+        }
+        remoteSet = true;
+        if (joinCommandOutput(remoteResult)) logs.push(`git remote\n${joinCommandOutput(remoteResult)}`);
+
+        const pushResult = await runGitCommand(workspacePath, ['push', '-u', 'origin', 'HEAD']);
+        if (!pushResult.ok) {
+          warnings.push('Remote configured but initial push failed. Verify remote access and run Publish again.');
+          logs.push(`git push\n${joinCommandOutput(pushResult)}`);
+        } else {
+          pushed = true;
+          if (joinCommandOutput(pushResult)) logs.push(`git push\n${joinCommandOutput(pushResult)}`);
+        }
+      }
+
+      res.status(200).json({
+        ok: true,
+        workspacePath,
+        repoPath: workspacePath,
+        remoteUrl,
+        remoteSet,
+        pushed,
+        warnings,
+        output: logs.join('\n\n').trim() || 'Workspace scaffold created.',
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        error: error?.message || 'Failed to bootstrap workspace',
+      });
+    }
+  });
+
+  app.post('/workspace/set-remote', async (req, res) => {
+    const repoPath = resolveRepoPath(req.body?.repoPath);
+    const remoteUrl = String(req.body?.remoteUrl || '').trim();
+    if (!repoPath) {
+      res.status(400).json({ ok: false, error: 'Invalid repository path' });
+      return;
+    }
+    if (!remoteUrl) {
+      res.status(400).json({ ok: false, error: 'remoteUrl is required' });
+      return;
+    }
+
+    const result = await setOriginRemote(repoPath, remoteUrl);
+    if (!result.ok) {
+      res.status(500).json({
+        ok: false,
+        error: 'Failed to configure origin remote',
+        remoteUrl,
+        ...result,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      ok: true,
+      repoPath,
+      remoteUrl,
+      ...result,
+    });
+  });
+
+  app.post('/workspace/publish', async (req, res) => {
+    const repoPath = resolveRepoPath(req.body?.repoPath);
+    const message = String(req.body?.message || '').trim() || 'chore: sync reqpilot workspace';
+    if (!repoPath) {
+      res.status(400).json({ ok: false, error: 'Invalid repository path' });
+      return;
+    }
+
+    const remoteCheck = await runGitCommand(repoPath, ['remote', 'get-url', 'origin']);
+    if (!remoteCheck.ok) {
+      res.status(400).json({
+        ok: false,
+        error: 'Origin remote is not configured for this workspace',
+        ...remoteCheck,
+      });
+      return;
+    }
+
+    const addResult = await runGitCommand(repoPath, ['add', '-A']);
+    if (!addResult.ok) {
+      res.status(500).json({
+        ok: false,
+        error: 'Failed to stage files',
+        ...addResult,
+      });
+      return;
+    }
+
+    const statusResult = await runGitCommand(repoPath, ['status', '--porcelain']);
+    let commitResult = { ok: true, stdout: '', stderr: '' };
+    if (statusResult.ok && statusResult.stdout.trim()) {
+      commitResult = await runGitCommand(repoPath, ['commit', '-m', message]);
+      if (!commitResult.ok) {
+        res.status(500).json({
+          ok: false,
+          error: 'Commit failed. Ensure git user.name/user.email are configured.',
+          ...commitResult,
+        });
+        return;
+      }
+    }
+
+    const pushResult = await runGitCommand(repoPath, ['push', '-u', 'origin', 'HEAD']);
+    if (!pushResult.ok) {
+      res.status(500).json({
+        ok: false,
+        error: 'Push failed. Check remote access/credentials.',
+        ...pushResult,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      ok: true,
+      repoPath,
+      message,
+      committed: Boolean(statusResult.stdout.trim()),
+      stdout: [commitResult.stdout, pushResult.stdout].filter(Boolean).join('\n'),
+      stderr: [commitResult.stderr, pushResult.stderr].filter(Boolean).join('\n'),
+    });
+  });
+
   if (staticDir) {
     app.use(express.static(staticDir));
     app.get('*', (req, res, next) => {
-      if (req.path.startsWith('/proxy') || req.path.startsWith('/health') || req.path.startsWith('/git')) {
+      if (
+        req.path.startsWith('/proxy') ||
+        req.path.startsWith('/health') ||
+        req.path.startsWith('/git') ||
+        req.path.startsWith('/workspace')
+      ) {
         return next();
       }
       return res.sendFile(path.join(staticDir, 'index.html'));

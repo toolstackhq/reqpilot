@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from './WorkspaceManager.module.css';
 import { gitAdd, gitCommit, gitFetch, gitPull, gitPush, gitStatus } from '../../utils/gitClient.js';
+import { bootstrapWorkspace, publishWorkspace, setWorkspaceRemote } from '../../utils/workspaceClient.js';
 
 function formatWorkspaceDate(value) {
   if (!value) return 'recently';
@@ -10,7 +11,10 @@ function formatWorkspaceDate(value) {
 }
 
 function joinOutput(result = {}) {
-  const chunks = [result.stdout, result.stderr].filter(Boolean).map((entry) => String(entry).trim()).filter(Boolean);
+  const chunks = [result.stdout, result.stderr, result.output]
+    .filter(Boolean)
+    .map((entry) => String(entry).trim())
+    .filter(Boolean);
   return chunks.length ? chunks.join('\n\n') : 'Done';
 }
 
@@ -24,7 +28,9 @@ export function WorkspaceManager({
   onClose,
 }) {
   const [nameInput, setNameInput] = useState('');
-  const [repoInput, setRepoInput] = useState('');
+  const [gitEnabledInput, setGitEnabledInput] = useState(false);
+  const [createRemoteInput, setCreateRemoteInput] = useState('');
+  const [remoteInput, setRemoteInput] = useState(activeWorkspace?.remoteUrl || '');
   const [gitPathInput, setGitPathInput] = useState(activeWorkspace?.repoPath || '');
   const [isRunning, setIsRunning] = useState(false);
   const [gitResult, setGitResult] = useState('');
@@ -34,6 +40,7 @@ export function WorkspaceManager({
   const [commitMessage, setCommitMessage] = useState('Update API assets');
 
   const hasGitRepo = Boolean((activeWorkspace?.repoPath || '').trim());
+  const isManagedWorkspace = Boolean(activeWorkspace?.gitManaged);
   const branchText = useMemo(() => {
     if (!gitState) return 'No git data loaded';
     const ahead = gitState.ahead ? `↑${gitState.ahead}` : '';
@@ -43,11 +50,12 @@ export function WorkspaceManager({
 
   useEffect(() => {
     setGitPathInput(activeWorkspace?.repoPath || '');
+    setRemoteInput(activeWorkspace?.remoteUrl || '');
     setGitResult('');
     setGitError('');
     setConflictWarning('');
     setGitState(null);
-  }, [activeWorkspace?.id, activeWorkspace?.repoPath]);
+  }, [activeWorkspace?.id, activeWorkspace?.repoPath, activeWorkspace?.remoteUrl]);
 
   async function refreshGitStatus(customPath) {
     const repoPath = String(customPath || activeWorkspace?.repoPath || '').trim();
@@ -92,19 +100,121 @@ export function WorkspaceManager({
     }
   }
 
+  async function publishNow() {
+    const repoPath = String(activeWorkspace?.repoPath || '').trim();
+    if (!repoPath) return;
+
+    setIsRunning(true);
+    setGitError('');
+    setConflictWarning('');
+    try {
+      const result = await publishWorkspace(repoPath, commitMessage.trim() || undefined);
+      setGitResult(`Publish\n\n${joinOutput(result)}`);
+      await refreshGitStatus(repoPath);
+    } catch (error) {
+      setGitError(error.message || 'Publish failed');
+      setGitResult(`Publish\n\n${joinOutput(error.details || {})}`);
+      await refreshGitStatus(repoPath);
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
+  async function saveRemote() {
+    const repoPath = String(activeWorkspace?.repoPath || '').trim();
+    const remoteUrl = String(remoteInput || '').trim();
+    if (!repoPath || !remoteUrl) return;
+
+    setIsRunning(true);
+    setGitError('');
+    try {
+      const result = await setWorkspaceRemote(repoPath, remoteUrl);
+      onUpdateWorkspace(activeWorkspace.id, { remoteUrl });
+      setGitResult(`Remote configured\n\n${joinOutput(result)}`);
+      await refreshGitStatus(repoPath);
+    } catch (error) {
+      setGitError(error.message || 'Failed to save remote');
+      setGitResult(joinOutput(error.details || {}));
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
   function saveRepoPath() {
     if (!activeWorkspace) return;
     onUpdateWorkspace(activeWorkspace.id, { repoPath: gitPathInput });
   }
 
-  function onCreateSubmit(event) {
+  async function bootstrapManagedWorkspace(workspace) {
+    const remoteUrl = String(workspace.remoteUrl || '').trim();
+    const result = await bootstrapWorkspace({
+      workspaceId: workspace.id,
+      name: workspace.name,
+      remoteUrl,
+    });
+
+    onUpdateWorkspace(workspace.id, {
+      gitManaged: true,
+      repoPath: result.repoPath,
+      workspacePath: result.workspacePath || result.repoPath,
+      remoteUrl: result.remoteUrl || remoteUrl,
+    });
+
+    if (Array.isArray(result.warnings) && result.warnings.length) {
+      setConflictWarning(result.warnings.join(' '));
+    }
+
+    setGitResult(result.output || 'Workspace scaffold created.');
+    await refreshGitStatus(result.repoPath);
+  }
+
+  async function initializeManagedLayout() {
+    if (!activeWorkspace) return;
+    setIsRunning(true);
+    setGitError('');
+    setConflictWarning('');
+    try {
+      await bootstrapManagedWorkspace(activeWorkspace);
+    } catch (error) {
+      setGitError(error.message || 'Failed to initialize managed workspace');
+      setGitResult(joinOutput(error.details || {}));
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
+  async function onCreateSubmit(event) {
     event.preventDefault();
     const name = nameInput.trim();
     if (!name) return;
 
-    onCreateWorkspace({ name, repoPath: repoInput.trim() });
-    setNameInput('');
-    setRepoInput('');
+    if (!gitEnabledInput) {
+      onCreateWorkspace({ name });
+      setNameInput('');
+      setCreateRemoteInput('');
+      return;
+    }
+
+    const workspace = onCreateWorkspace({
+      name,
+      gitManaged: true,
+      remoteUrl: createRemoteInput.trim(),
+    });
+
+    setIsRunning(true);
+    setGitError('');
+    setConflictWarning('');
+    try {
+      await bootstrapManagedWorkspace(workspace);
+      setNameInput('');
+      setCreateRemoteInput('');
+      setGitEnabledInput(false);
+    } catch (error) {
+      setGitError(error.message || 'Workspace was created but bootstrap failed');
+      setGitResult(joinOutput(error.details || {}));
+    } finally {
+      setIsRunning(false);
+    }
   }
 
   return (
@@ -136,7 +246,7 @@ export function WorkspaceManager({
                       <span className={styles.workspaceName}>{workspace.name}</span>
                       {isActive ? <span className={styles.badge}>Active</span> : null}
                     </div>
-                    <span className={styles.workspaceMeta}>{workspace.repoPath ? 'Git connected' : 'Git not connected'}</span>
+                    <span className={styles.workspaceMeta}>{workspace.gitManaged ? 'Managed Git workspace' : workspace.repoPath ? 'Git connected' : 'Local workspace'}</span>
                     <div className={styles.workspaceCardActions}>
                       <span className={styles.workspaceMeta}>Created {formatWorkspaceDate(workspace.createdAt)}</span>
                       {isActive ? (
@@ -151,7 +261,7 @@ export function WorkspaceManager({
                 );
               })}
             </div>
-            <p className={styles.sidebarHint}>Tip: use the top bar workspace menu to reopen this manager anytime.</p>
+            <p className={styles.sidebarHint}>Tip: managed Git workspaces are scaffolded in a safe ReqPilot location automatically.</p>
           </aside>
 
           <div className={styles.main}>
@@ -165,14 +275,27 @@ export function WorkspaceManager({
                   placeholder="Workspace name"
                   aria-label="New workspace name"
                 />
-                <input
-                  className={styles.input}
-                  value={repoInput}
-                  onChange={(event) => setRepoInput(event.target.value)}
-                  placeholder="Optional git repo path"
-                  aria-label="New workspace git repo path"
-                />
-                <button type="submit" className={styles.createButton}>
+                <label className={styles.toggleRow}>
+                  <input
+                    type="checkbox"
+                    checked={gitEnabledInput}
+                    onChange={(event) => setGitEnabledInput(event.target.checked)}
+                  />
+                  Git-enabled (managed layout)
+                </label>
+                {gitEnabledInput ? (
+                  <>
+                    <input
+                      className={styles.input}
+                      value={createRemoteInput}
+                      onChange={(event) => setCreateRemoteInput(event.target.value)}
+                      placeholder="Optional remote repository URL"
+                      aria-label="New workspace remote URL"
+                    />
+                    <p className={styles.helper}>ReqPilot creates this workspace under `~/.reqpilot/workspaces` with a standard `.reqpilot` layout.</p>
+                  </>
+                ) : null}
+                <button type="submit" className={styles.createButton} disabled={isRunning}>
                   Create & Open
                 </button>
               </form>
@@ -190,30 +313,82 @@ export function WorkspaceManager({
                   <dd>{formatWorkspaceDate(activeWorkspace?.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt>Git</dt>
-                  <dd>{hasGitRepo ? 'Connected' : 'Not connected'}</dd>
+                  <dt>Mode</dt>
+                  <dd>{isManagedWorkspace ? 'Managed Git' : hasGitRepo ? 'Git Linked' : 'Local'}</dd>
                 </div>
               </dl>
-              <div className={styles.row}>
-                <input
-                  className={styles.input}
-                  value={gitPathInput}
-                  onChange={(event) => setGitPathInput(event.target.value)}
-                  placeholder="Git repository path (local)"
-                  aria-label="Workspace git repository path"
-                />
-                <button type="button" className={styles.action} onClick={saveRepoPath}>
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className={styles.action}
-                  onClick={() => refreshGitStatus(gitPathInput)}
-                  disabled={!gitPathInput.trim() || isRunning}
-                >
-                  Check Repo
-                </button>
-              </div>
+
+              {isManagedWorkspace ? (
+                <>
+                  <input
+                    className={`${styles.input} ${styles.inputReadonly}`}
+                    value={activeWorkspace?.workspacePath || activeWorkspace?.repoPath || ''}
+                    readOnly
+                    placeholder="Workspace path"
+                    aria-label="Managed workspace path"
+                  />
+
+                  {!hasGitRepo ? (
+                    <div className={styles.row}>
+                      <button
+                        type="button"
+                        className={`${styles.action} ${styles.actionPrimary}`}
+                        onClick={initializeManagedLayout}
+                        disabled={isRunning}
+                      >
+                        Initialize Layout
+                      </button>
+                    </div>
+                  ) : null}
+
+                  <div className={styles.row}>
+                    <input
+                      className={styles.input}
+                      value={remoteInput}
+                      onChange={(event) => setRemoteInput(event.target.value)}
+                      placeholder="Remote URL (origin)"
+                      aria-label="Workspace remote URL"
+                    />
+                    <button
+                      type="button"
+                      className={styles.action}
+                      onClick={saveRemote}
+                      disabled={isRunning || !hasGitRepo || !remoteInput.trim()}
+                    >
+                      Save Remote
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.action} ${styles.actionPrimary}`}
+                      onClick={publishNow}
+                      disabled={isRunning || !hasGitRepo || !remoteInput.trim()}
+                    >
+                      Publish
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className={styles.row}>
+                  <input
+                    className={styles.input}
+                    value={gitPathInput}
+                    onChange={(event) => setGitPathInput(event.target.value)}
+                    placeholder="Git repository path (local)"
+                    aria-label="Workspace git repository path"
+                  />
+                  <button type="button" className={styles.action} onClick={saveRepoPath}>
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.action}
+                    onClick={() => refreshGitStatus(gitPathInput)}
+                    disabled={!gitPathInput.trim() || isRunning}
+                  >
+                    Check Repo
+                  </button>
+                </div>
+              )}
               <p className={styles.helper}>
                 Keep conflicts external for safety. ReqPilot supports fetch, pull, stage/add, commit, and push.
               </p>
@@ -293,7 +468,7 @@ export function WorkspaceManager({
                   )}
                 </>
               ) : (
-                <p className={styles.empty}>Set repository path in this workspace to enable Git actions.</p>
+                <p className={styles.empty}>Create a git-enabled workspace or connect a local repository path to enable Git actions.</p>
               )}
 
               {conflictWarning ? <p className={styles.warning}>{conflictWarning}</p> : null}
