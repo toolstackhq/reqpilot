@@ -4,6 +4,7 @@ playwright-report/
 .vscode/
 .DS_Store
 tmp/
+t/
 h*.png
 dist/
 desktop-wrapper/
