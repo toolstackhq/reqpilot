@@ -2,9 +2,10 @@
   "name": "@toolstackhq/reqpilot",
   "version": "1.0.3",
   "description": "Lightweight local-first REST API client. Modern Postman alternative.",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toolstackhq/reqpilot"
+    "url": "git+https://github.com/toolstackhq/reqpilot.git"
   },
   "homepage": "https://github.com/toolstackhq/reqpilot",
   "bugs": {
@@ -29,6 +30,7 @@
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:all": "vitest run && playwright test",
     "mock-server": "node tests/mock-server/mock-api-server.js"
@@ -53,6 +55,7 @@
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.1.9",
     "concurrently": "^9.2.1",
     "jsdom": "^24.1.1",
     "vite": "^5.4.10",
