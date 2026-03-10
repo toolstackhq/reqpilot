@@ -90,10 +90,29 @@ describe('httpClient', () => {
     );
 
     expect(payload.security.verifySsl).toBe(true);
+    expect(payload.security.useProxy).toBe(true);
     expect(payload.security.ca).toContain('BEGIN CERTIFICATE');
     expect(payload.security.cert).toContain('BEGIN CERTIFICATE');
     expect(payload.security.key).toContain('BEGIN PRIVATE KEY');
     expect(payload.security.passphrase).toBe('secret');
+  });
+
+  test('allows disabling system proxy forwarding in security payload', () => {
+    const payload = buildProxyPayload(
+      {
+        method: 'GET',
+        url: 'https://localhost:4444/secure',
+        headers: [],
+        body: { type: 'none', raw: '', form: [] },
+      },
+      {
+        verifySsl: true,
+        useProxy: false,
+      }
+    );
+
+    expect(payload.security.verifySsl).toBe(true);
+    expect(payload.security.useProxy).toBe(false);
   });
 
   test('returns default header preview for json post', () => {

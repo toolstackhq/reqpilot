@@ -404,6 +404,42 @@
   gap: 0.6rem;
 }
 
+.settingsProxyBlock {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.72rem;
+  background: var(--surface);
+  padding: 0.62rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.settingsReadonlyGrid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.settingsBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.settingsLinkButton {
+  border: 0;
+  background: transparent;
+  color: var(--accent-primary);
+  font-size: 0.69rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.settingsLinkButton:hover {
+  color: var(--accent-primary-hover);
+  text-decoration: underline;
+}
+
 .settingsBlockTitle {
   margin: 0;
   color: var(--text-secondary);

@@ -35,6 +35,18 @@ afterAll(async () => {
 });
 
 describe('proxy integration', () => {
+  test('returns system proxy metadata safely', async () => {
+    const response = await fetch(`http://localhost:${proxyPort}/system/proxy`);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(typeof data.ok).toBe('boolean');
+    expect(data.proxy).toBeDefined();
+    expect(typeof data.proxy.httpProxy).toBe('string');
+    expect(typeof data.proxy.httpsProxy).toBe('string');
+    expect(typeof data.proxy.noProxy).toBe('string');
+  });
+
   test('forwards GET request', async () => {
     const data = await proxyRequest({ method: 'GET', url: `http://localhost:${mockPort}/api/users`, headers: {}, body: '' });
 

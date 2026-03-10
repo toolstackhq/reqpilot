@@ -7,6 +7,7 @@ import { BodyEditor } from './BodyEditor.jsx';
 import { AuthEditor } from './AuthEditor.jsx';
 import { parseParamsFromUrl, applyParamsToUrl } from '../../utils/urlSync.js';
 import { highlightJavaScript, formatJavaScript } from '../../utils/syntaxHighlight.js';
+import { fetchSystemProxyEnv } from '../../utils/systemClient.js';
 
 const TABS = ['Parameters', 'Body', 'Headers', 'Authorization', 'Settings', 'Pre-request Script', 'Post-request Script'];
 
@@ -172,12 +173,50 @@ function ScriptPanel({ id, title, value, onChange, placeholder, intro, docLabel,
 
 function RequestSettingsPanel({ request, onChange }) {
   const sslMode = request.security?.sslVerification || 'inherit';
+  const proxyMode = request.security?.proxyUsage || 'inherit';
   const security = request.security || {};
   const [textEditMode, setTextEditMode] = useState({
     ca: false,
     cert: false,
     key: false,
   });
+  const [systemProxy, setSystemProxy] = useState({
+    loading: false,
+    available: false,
+    httpProxy: '',
+    httpsProxy: '',
+    noProxy: '',
+  });
+  const [showProxyValues, setShowProxyValues] = useState(false);
+  const [showTlsCertificates, setShowTlsCertificates] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (proxyMode !== 'enabled' || !showProxyValues) return () => {};
+
+    setSystemProxy((prev) => ({ ...prev, loading: true }));
+
+    fetchSystemProxyEnv().then((data) => {
+      if (cancelled) return;
+      setSystemProxy({
+        loading: false,
+        available: data.available,
+        httpProxy: data.httpProxy,
+        httpsProxy: data.httpsProxy,
+        noProxy: data.noProxy,
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [proxyMode, showProxyValues]);
+
+  useEffect(() => {
+    if (proxyMode !== 'enabled') {
+      setShowProxyValues(false);
+    }
+  }, [proxyMode]);
 
   function updateSecurity(patch) {
     onChange({
@@ -266,9 +305,62 @@ function RequestSettingsPanel({ request, onChange }) {
           </select>
         </label>
 
+        <label className={styles.settingsField}>
+          <span>System proxy environment</span>
+          <select
+            value={proxyMode}
+            onChange={(event) => updateSecurity({ proxyUsage: event.target.value })}
+            className={styles.inlineSelect}
+          >
+            <option value="inherit">Inherit workspace setting</option>
+            <option value="enabled">Always use proxy env</option>
+            <option value="disabled">Never use proxy env</option>
+          </select>
+        </label>
+
         <p className={styles.settingsHelp}>
-          Inherit uses host-level and global SSL policy from SSL & Security settings.
+          Inherit uses host-level and global SSL/proxy policy from SSL & Security settings.
         </p>
+        {proxyMode === 'enabled' ? (
+          <div className={styles.settingsProxyBlock}>
+            <div className={styles.settingsBlockHeader}>
+              <p className={styles.settingsBlockTitle}>System Proxy (read-only)</p>
+              <button
+                type="button"
+                className={styles.settingsLinkButton}
+                onClick={() => setShowProxyValues((prev) => !prev)}
+              >
+                {showProxyValues ? 'Hide proxy values' : 'Show proxy values'}
+              </button>
+            </div>
+            {showProxyValues ? (
+              <>
+                {systemProxy.loading ? <p className={styles.settingsHelp}>Loading system proxy values…</p> : null}
+                {!systemProxy.loading && !systemProxy.available ? (
+                  <p className={styles.settingsHelp}>System proxy values are unavailable in this runtime.</p>
+                ) : null}
+                {!systemProxy.loading && systemProxy.available ? (
+                  <div className={styles.settingsReadonlyGrid}>
+                    <label className={styles.settingsField}>
+                      <span>HTTPS_PROXY</span>
+                      <input className={styles.inlineSelect} readOnly value={systemProxy.httpsProxy || 'Not set'} />
+                    </label>
+                    <label className={styles.settingsField}>
+                      <span>HTTP_PROXY</span>
+                      <input className={styles.inlineSelect} readOnly value={systemProxy.httpProxy || 'Not set'} />
+                    </label>
+                    <label className={styles.settingsField}>
+                      <span>NO_PROXY</span>
+                      <input className={styles.inlineSelect} readOnly value={systemProxy.noProxy || 'Not set'} />
+                    </label>
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <p className={styles.settingsHelp}>Proxy values are hidden.</p>
+            )}
+          </div>
+        ) : null}
         {sslMode === 'disabled' ? (
           <p className={styles.settingsWarning}>
             SSL verification disabled for this request. Use only for trusted development endpoints.
@@ -276,25 +368,40 @@ function RequestSettingsPanel({ request, onChange }) {
         ) : null}
 
         <div className={styles.settingsTlsBlock}>
-          <p className={styles.settingsBlockTitle}>TLS Certificates (Advanced)</p>
-          <p className={styles.settingsHelp}>
-            Upload PEM files. Use `Edit as text` only if you need to inspect or modify content.
-          </p>
-          {renderPemField('ca', 'CA Certificate (PEM)', '.pem,.crt,.cer,.txt', '-----BEGIN CERTIFICATE-----')}
-          {renderPemField('cert', 'Client Certificate (PEM)', '.pem,.crt,.cer,.txt', '-----BEGIN CERTIFICATE-----')}
-          {renderPemField('key', 'Client Private Key (PEM)', '.pem,.key,.txt', '-----BEGIN PRIVATE KEY-----')}
+          <div className={styles.settingsBlockHeader}>
+            <p className={styles.settingsBlockTitle}>TLS Certificates (Advanced)</p>
+            <button
+              type="button"
+              className={styles.settingsLinkButton}
+              onClick={() => setShowTlsCertificates((prev) => !prev)}
+            >
+              {showTlsCertificates ? 'Hide TLS certificates' : 'Show TLS certificates'}
+            </button>
+          </div>
+          {showTlsCertificates ? (
+            <>
+              <p className={styles.settingsHelp}>
+                Upload PEM files. Use `Edit as text` only if you need to inspect or modify content.
+              </p>
+              {renderPemField('ca', 'CA Certificate (PEM)', '.pem,.crt,.cer,.txt', '-----BEGIN CERTIFICATE-----')}
+              {renderPemField('cert', 'Client Certificate (PEM)', '.pem,.crt,.cer,.txt', '-----BEGIN CERTIFICATE-----')}
+              {renderPemField('key', 'Client Private Key (PEM)', '.pem,.key,.txt', '-----BEGIN PRIVATE KEY-----')}
 
-          <label className={styles.settingsField}>
-            <span>Private Key Passphrase (optional)</span>
-            <input
-              type="password"
-              className={styles.inlineSelect}
-              value={security.passphrase || ''}
-              onChange={(event) => updateSecurity({ passphrase: event.target.value })}
-              placeholder="passphrase"
-              autoComplete="off"
-            />
-          </label>
+              <label className={styles.settingsField}>
+                <span>Private Key Passphrase (optional)</span>
+                <input
+                  type="password"
+                  className={styles.inlineSelect}
+                  value={security.passphrase || ''}
+                  onChange={(event) => updateSecurity({ passphrase: event.target.value })}
+                  placeholder="passphrase"
+                  autoComplete="off"
+                />
+              </label>
+            </>
+          ) : (
+            <p className={styles.settingsHelp}>TLS certificate controls are hidden.</p>
+          )}
         </div>
       </div>
     </div>

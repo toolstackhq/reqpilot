@@ -6,6 +6,26 @@ import os from 'node:os';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { ProxyAgent } from 'proxy-agent';
+
+const outboundProxyAgent = new ProxyAgent();
+
+function maskProxyValue(value = '') {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  try {
+    const parsed = new URL(raw);
+    if (parsed.username || parsed.password) {
+      parsed.username = '***';
+      parsed.password = '***';
+      return parsed.toString();
+    }
+    return parsed.toString();
+  } catch {
+    return raw.replace(/\/\/([^/@:\s]+):([^/@\s]+)@/g, '//***:***@');
+  }
+}
 
 function sanitizeHeaders(headers = {}) {
   return Object.fromEntries(
@@ -244,6 +264,7 @@ export async function executeProxyRequest({ method, url, headers, body, security
     const isHttps = parsedUrl.protocol === 'https:';
     const transport = isHttps ? https : http;
     const verifySsl = security?.verifySsl !== false;
+    const useProxy = security?.useProxy !== false;
     const ca = typeof security?.ca === 'string' && security.ca.trim() ? security.ca : undefined;
     const cert = typeof security?.cert === 'string' && security.cert.trim() ? security.cert : undefined;
     const key = typeof security?.key === 'string' && security.key.trim() ? security.key : undefined;
@@ -256,6 +277,7 @@ export async function executeProxyRequest({ method, url, headers, body, security
       method: normalizedMethod,
       path: `${parsedUrl.pathname}${parsedUrl.search}`,
       headers: reqHeaders,
+      agent: useProxy ? outboundProxyAgent : undefined,
       rejectUnauthorized: verifySsl,
       ca,
       cert,
@@ -328,6 +350,32 @@ export function createProxyApp({ staticDir } = {}) {
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
+  });
+
+  app.get('/system/proxy', (_req, res) => {
+    try {
+      const httpProxy = maskProxyValue(process.env.HTTP_PROXY || process.env.http_proxy || '');
+      const httpsProxy = maskProxyValue(process.env.HTTPS_PROXY || process.env.https_proxy || '');
+      const noProxy = String(process.env.NO_PROXY || process.env.no_proxy || '').trim();
+
+      res.json({
+        ok: true,
+        proxy: {
+          httpProxy,
+          httpsProxy,
+          noProxy,
+        },
+      });
+    } catch {
+      res.status(200).json({
+        ok: false,
+        proxy: {
+          httpProxy: '',
+          httpsProxy: '',
+          noProxy: '',
+        },
+      });
+    }
   });
 
   app.post('/git/status', async (req, res) => {
@@ -620,6 +668,7 @@ export function createProxyApp({ staticDir } = {}) {
         req.path.startsWith('/proxy') ||
         req.path.startsWith('/health') ||
         req.path.startsWith('/git') ||
+        req.path.startsWith('/system') ||
         req.path.startsWith('/workspace')
       ) {
         return next();

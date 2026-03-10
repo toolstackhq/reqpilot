@@ -5,6 +5,7 @@ export function SecurityModal({
   settings,
   onClose,
   onChangeDefaultVerification,
+  onChangeSystemProxyUsage,
   onAddHostRule,
   onUpdateHostRule,
   onRemoveHostRule,
@@ -58,6 +59,15 @@ export function SecurityModal({
               />
               <span>SSL certificate verification</span>
               <small>Applies to all hosts unless overridden.</small>
+            </label>
+            <label className={styles.toggleRow}>
+              <input
+                type="checkbox"
+                checked={settings?.useSystemProxy !== false}
+                onChange={(event) => onChangeSystemProxyUsage(event.target.checked)}
+              />
+              <span>Use system proxy environment</span>
+              <small>When enabled, ReqPilot uses `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY`.</small>
             </label>
           </section>
 
@@ -145,4 +155,3 @@ export function SecurityModal({
     </div>
   );
 }
-

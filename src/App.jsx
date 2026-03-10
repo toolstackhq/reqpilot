@@ -76,6 +76,7 @@ function createDefaultRequest() {
     },
     security: {
       sslVerification: 'inherit',
+      proxyUsage: 'inherit',
       ca: '',
       cert: '',
       key: '',
@@ -161,6 +162,7 @@ export default function App() {
   const {
     settings: securitySettings,
     setVerifySslByDefault,
+    setUseSystemProxy,
     addHostRule,
     updateHostRule,
     removeHostRule,
@@ -884,6 +886,7 @@ export default function App() {
           settings={securitySettings}
           onClose={() => setShowSecuritySettings(false)}
           onChangeDefaultVerification={setVerifySslByDefault}
+          onChangeSystemProxyUsage={setUseSystemProxy}
           onAddHostRule={addHostRule}
           onUpdateHostRule={updateHostRule}
           onRemoveHostRule={removeHostRule}
