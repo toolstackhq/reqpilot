@@ -3,5 +3,6 @@
   <circle cx="17" cy="18" r="5" fill="#0EA5E9" />
   <circle cx="17" cy="46" r="5" fill="#0EA5E9" />
   <circle cx="31" cy="32" r="5" fill="#0EA5E9" />
-  <path d="M36 27L51 32L36 37L39 32L36 27Z" fill="#22C55E" />
+  <path d="M35.4 24.8L53.4 31.5L35.4 40.6L39 33.3L35.4 24.8Z" fill="#22C55E" />
+  <path d="M39 33.3L53.4 31.5L40.2 37.9" stroke="#ECFDF5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

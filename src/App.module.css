@@ -76,6 +76,13 @@
   fill: #22c55e;
 }
 
+.brandPlaneFold {
+  stroke: #ecfdf5;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .workspaceSelect,
 .navButton,
 .navButtonGhost {

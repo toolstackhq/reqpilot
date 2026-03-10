@@ -495,7 +495,8 @@ export default function App() {
                 <circle className={styles.brandNode} cx="17" cy="18" r="5" />
                 <circle className={styles.brandNode} cx="17" cy="46" r="5" />
                 <circle className={styles.brandNode} cx="31" cy="32" r="5" />
-                <path className={styles.brandPlane} d="M36 27L51 32L36 37L39 32L36 27Z" />
+                <path className={styles.brandPlane} d="M35.4 24.8L53.4 31.5L35.4 40.6L39 33.3L35.4 24.8Z" />
+                <path className={styles.brandPlaneFold} d="M39 33.3L53.4 31.5L40.2 37.9" />
               </svg>
             </span>
             <span className={styles.brandText}>REQPILOT</span>
