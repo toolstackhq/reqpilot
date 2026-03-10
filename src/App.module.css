@@ -33,11 +33,47 @@
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
   font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: color-mix(in oklab, var(--accent-primary) 90%, #1a56db);
+}
+
+.brandText {
+  line-height: 1;
+}
+
+.brandIconWrap {
+  width: 1.36rem;
+  height: 1.36rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--border) 78%, #b6cdf8);
+  background: color-mix(in oklab, var(--surface-soft) 88%, #eef4ff);
+  display: inline-grid;
+  place-items: center;
+}
+
+.brandIcon {
+  width: 1.03rem;
+  height: 1.03rem;
+}
+
+.brandLink {
+  stroke: #0ea5e9;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.brandNode {
+  fill: #0ea5e9;
+}
+
+.brandPlane {
+  fill: #22c55e;
 }
 
 .workspaceSelect,

@@ -8,7 +8,9 @@ h*.png
 dist/
 desktop-wrapper/
 docs/.vitepress/dist/
-/public/
+/public/*
+!/public/
+!/public/reqpilot-icon.svg
 reqpilot-final-prompt.md
 d
 d.jpg
