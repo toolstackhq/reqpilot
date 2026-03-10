@@ -1,33 +1,31 @@
 # Importing Collections
 
-ReqPilot supports importing API definitions and collections so you can start testing immediately.
+ReqPilot can bootstrap your workspace from existing API definitions quickly.
 
 ## Supported Formats
 
-- Postman Collection v2.0
-- Postman Collection v2.1
-- OpenAPI 3.x (JSON/YAML)
-- Swagger 2.0 (JSON/YAML)
+- Postman Collection `v2.0` and `v2.1`
+- OpenAPI `3.x` (JSON or YAML)
+- Swagger `2.0` (JSON or YAML)
 
-## How to Import
+## Import Flow
 
-1. Open ReqPilot.
-2. Click **Import** in the top area.
-3. Choose a file from your system.
-4. ReqPilot detects format and parses requests.
-5. Imported requests appear in your collections panel.
+1. Click `Import` from the top bar.
+2. Choose file.
+3. ReqPilot detects and parses the format.
+4. Imported requests appear under Collections.
 
-## What Gets Imported
+## What Gets Mapped
 
 - Request name
 - Method
-- URL
-- Query parameters
+- URL and query params
 - Headers
-- Body payload (where applicable)
-- Auth details (when present in source)
+- Body payload
+- Authorization (where supported)
 
-## Import Tips
+## Practical Tips
 
-- If a file includes unresolved variables, define them in an environment before sending requests.
-- If your source file has unsupported fields, ReqPilot keeps core request data and skips unknown metadata.
+- Define variables in an environment after import when placeholders exist.
+- Keep source collections under version control; re-import after major upstream changes.
+- Use workspace isolation when testing imports from multiple teams.

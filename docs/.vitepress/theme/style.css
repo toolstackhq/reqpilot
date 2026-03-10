@@ -61,3 +61,30 @@
   padding: 0.85rem 1rem;
   background: var(--vp-c-bg-soft);
 }
+
+.rp-shot {
+  margin: 1rem 0 1.4rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--vp-c-bg-soft);
+}
+
+.rp-shot img {
+  width: 100%;
+  display: block;
+}
+
+.rp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 1rem 0;
+}
+
+.rp-grid > div {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background: var(--vp-c-bg-soft);
+}

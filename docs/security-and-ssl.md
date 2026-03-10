@@ -1,46 +1,45 @@
-# Security and SSL
+# Security, SSL, and Proxy Controls
 
-ReqPilot includes request-level controls for secure communication and certificate handling.
+ReqPilot has two security layers:
 
-## SSL Options
+1. Workspace-level defaults (`SSL & Security` modal)
+2. Request-level overrides (`Settings` tab in request builder)
 
-<DocTabs
-  :tabs="[
-    { id: 'verify', label: 'SSL Verification' },
-    { id: 'certs', label: 'Client Certificates' },
-    { id: 'proxy', label: 'Local Proxy Model' }
-  ]"
->
-  <template v-slot:verify>
-    <ul>
-      <li>Toggle SSL verification at request level.</li>
-      <li>Keep verification on by default for production-like behavior.</li>
-      <li>Disable only for local or self-signed development endpoints.</li>
-    </ul>
+## Workspace-level Settings
 
-  </template>
+Use footer `SSL` button to open global security settings.
 
-  <template v-slot:certs>
-    <ul>
-      <li>Add client certificate (<code>.pem</code>) and private key (<code>.pem</code>) per target host.</li>
-      <li>Provide cert/key values by uploading files or pasting text.</li>
-      <li>Use this for mTLS APIs and internal enterprise gateways.</li>
-    </ul>
+- Default SSL verification toggle
+- Default system proxy usage toggle
+- Host-specific SSL rules (exact/wildcard patterns)
 
-  </template>
+<div class="rp-shot">
+  <img src="/screenshots/security-settings.png" alt="SSL and security settings modal" />
+</div>
 
-  <template v-slot:proxy>
-    <ul>
-      <li>ReqPilot routes requests through a local proxy layer to avoid browser CORS restrictions.</li>
-      <li>Security settings are applied in that proxy request pipeline.</li>
-      <li>The proxy stays an implementation detail for the user.</li>
-    </ul>
+## Request-level Settings
 
-  </template>
-</DocTabs>
+In each request's `Settings` tab:
 
-## Recommended Defaults
+- SSL mode: inherit / always verify / disable verification
+- Proxy mode: inherit / always use proxy env / never use proxy env
+- Optional read-only display of `HTTPS_PROXY`, `HTTP_PROXY`, `NO_PROXY`
+- Advanced TLS cert inputs (CA, cert, key, passphrase)
 
-1. Keep SSL verification enabled.
-2. Use host-scoped certs for private APIs.
-3. Avoid committing sensitive cert/key files to source control.
+## TLS Certificates
+
+ReqPilot supports client certificate configuration with both file upload and text entry:
+
+- CA certificate (PEM)
+- Client certificate (PEM)
+- Client private key (PEM)
+- Optional passphrase
+
+Use these only for trusted enterprise endpoints requiring mTLS.
+
+## Recommended Policy
+
+1. Keep SSL verification enabled by default.
+2. Add host-specific exceptions only when required.
+3. Keep proxy usage explicit in enterprise networks.
+4. Do not commit private cert material into Git repositories.

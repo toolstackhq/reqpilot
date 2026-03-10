@@ -1,74 +1,72 @@
 # Environments and Variables
 
-Use environments to avoid hardcoding hostnames, tokens, and IDs in requests.
+Use environments to avoid hardcoding hosts, tokens, or tenant IDs.
 
 ## Variable Syntax
-
-Use double-curly syntax:
 
 ```text
 {{variable_name}}
 ```
 
-Example:
-
-```text
-http://{{host}}:4444/api/users
-```
-
-## Create and Use an Environment
-
-1. Open the Environments panel.
-2. Create a new environment (for example: `local`, `staging`, `prod`).
-3. Add key-value pairs like:
-   - `host = localhost`
-   - `token = abc123`
-4. Select the active environment from the main UI.
-5. Send requests with variables.
-
-Resolved variables are shown in green and unresolved variables in red.
-
-## Where Variables Work
-
-### URL Variables
+Example URL:
 
 ```bash
 http://{{host}}:4444/api/users/{{user_id}}
 ```
 
-Use this for host switching and path parameters.
+## Create and Use an Environment
 
-### Header Variables
+1. Open `Environments`.
+2. Create environment (for example, `local` or `staging`).
+3. Add key/value rows.
+4. Save and switch active environment.
+5. Send requests using template variables with double-curly syntax.
+
+<div class="rp-shot">
+  <img src="/screenshots/environment-manager.png" alt="Environment manager with variable editor" />
+</div>
+
+## Resolution Behavior
+
+- Resolved variables show in green.
+- Missing variables show in red.
+
+<div class="rp-shot">
+  <img src="/screenshots/variable-resolution.png" alt="Resolved and unresolved variables in status bar" />
+</div>
+
+## Where Variables Work
+
+### URL
+
+```bash
+http://{{host}}:4444/api/users/{{user_id}}
+```
+
+### Headers
 
 ```http
 Authorization: Bearer {{token}}
 X-Tenant: {{tenant_id}}
 ```
 
-Useful for auth and multi-tenant headers.
-
-### Body Variables
+### JSON Body
 
 ```json
 {
-  "name": "{{username}}",
   "email": "{{email}}",
-  "tenant": "{{tenant_id}}"
+  "role": "{{role}}"
 }
 ```
 
-Use this for reusable payload templates across environments.
+### Authorization Fields
 
-### Authorization Variables
-
-```bash
+```text
 Bearer {{token}}
 ```
 
-Works with authorization settings so tokens can rotate by environment.
-
 ## Troubleshooting
 
-- Variable shows red: key is missing in the active environment.
-- Value not changing: verify you switched to the intended environment.
-- URL fails after replacement: check protocol (`http`/`https`) and host value.
+- Red variable chip: key missing in active environment.
+- Wrong value used: check current active environment in footer.
+- URL failed after replacement: validate host/protocol and resolved path.

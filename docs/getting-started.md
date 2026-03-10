@@ -1,40 +1,58 @@
-# Getting Started
+# Quick Start
 
-## Install and Run
+## Run ReqPilot
+
+### Option A: Run published package (fastest)
+
+```bash
+npx @toolstackhq/reqpilot
+```
+
+ReqPilot starts at `http://localhost:5489`.
+
+### Option B: Run from source
 
 ```bash
 npm install
 npm run dev
 ```
 
-ReqPilot opens on:
-
 - App UI: `http://localhost:5173`
-- Local proxy/API bridge: `http://localhost:5489`
+- Backend bridge: `http://localhost:5489`
+- Optional mock API (for local testing): `npm run mock-server` (`http://localhost:4444`)
 
-## Run Tests
+## First Request in 60 Seconds
+
+1. Open ReqPilot.
+2. Keep `GET` method.
+3. Set URL to `http://localhost:4444/api/users` (or your own endpoint).
+4. Click `Send`.
+5. Check `Status / Time / Size` and response `JSON` tab.
+
+<div class="rp-shot">
+  <img src="/screenshots/app-overview.png" alt="ReqPilot app overview with request and response" />
+</div>
+
+## Core Shortcuts
+
+- `Ctrl/Cmd + K`: Command palette
+- `Ctrl/Cmd + Enter`: Send request
+- `Ctrl/Cmd + S`: Save request
+- `Ctrl/Cmd + N`: New request tab
+- `Ctrl/Cmd + L`: Focus URL bar
+- `Esc`: Close open overlays/drawers
+
+## Validate Your Setup
 
 ```bash
-# Unit + integration
 npm test
-
-# End-to-end
 npm run test:e2e
 ```
 
-## Build for Production
+## Generate Docs Screenshots Locally
 
 ```bash
-npm run build
+npm run docs:screenshots
 ```
 
-## Core Layout
-
-- Left sidebar: collections, environments, and history.
-- Center panel: request tabs, method/URL, parameters/body/headers/auth/scripts.
-- Bottom panel: response tabs (JSON, raw, headers, test results) with status/time/size.
-
-## Next Guides
-
-- Import guide: `/importing-collections`
-- Environments and variables: `/environments-and-variables`
+This captures fresh UI images into `docs/public/screenshots` for documentation updates.
