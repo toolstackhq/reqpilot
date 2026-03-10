@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import fs from 'node:fs';
 import path from 'node:path';
 import { exec } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -32,6 +33,19 @@ export function startServer({
 }
 
 const current = fileURLToPath(import.meta.url);
-if (process.argv[1] && path.resolve(process.argv[1]) === current) {
-  startServer();
+const invokedPath = process.argv[1];
+
+if (invokedPath) {
+  try {
+    const resolvedInvoked = fs.realpathSync(path.resolve(invokedPath));
+    const resolvedCurrent = fs.realpathSync(current);
+    if (resolvedInvoked === resolvedCurrent) {
+      startServer();
+    }
+  } catch {
+    // Fallback to previous behavior if symlink resolution fails.
+    if (path.resolve(invokedPath) === current) {
+      startServer();
+    }
+  }
 }
