@@ -490,14 +490,7 @@ export default function App() {
         <div className={styles.topBarLeft}>
           <div className={styles.brand}>
             <span className={styles.brandIconWrap} aria-hidden="true">
-              <svg className={styles.brandIcon} viewBox="0 0 64 64" fill="none">
-                <path className={styles.brandLink} d="M17 18L31 30M17 46L31 34" />
-                <circle className={styles.brandNode} cx="17" cy="18" r="5" />
-                <circle className={styles.brandNode} cx="17" cy="46" r="5" />
-                <circle className={styles.brandNode} cx="31" cy="32" r="5" />
-                <path className={styles.brandPlane} d="M35.4 24.8L53.4 31.5L35.4 40.6L39 33.3L35.4 24.8Z" />
-                <path className={styles.brandPlaneFold} d="M39 33.3L53.4 31.5L40.2 37.9" />
-              </svg>
+              <img className={styles.brandIcon} src="/icon-192.png" alt="" />
             </span>
             <span className={styles.brandText}>REQPILOT</span>
           </div>

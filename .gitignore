@@ -10,7 +10,12 @@ desktop-wrapper/
 docs/.vitepress/dist/
 /public/*
 !/public/
-!/public/reqpilot-icon.svg
+!/public/favicon.ico
+!/public/apple-touch-icon.png
+!/public/icon-192.png
+!/public/icon-512.png
+!/public/icon-192-maskable.png
+!/public/icon-512-maskable.png
 reqpilot-final-prompt.md
 d
 d.jpg
